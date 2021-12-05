@@ -81,7 +81,7 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
     // taking texture files from relative path
     private final String texturePath = ".\\resources\\";
 //    final String textureFileName = "GelbGruenPalette.png";
-    final String textureFileName = "wall.jpg";
+    final String textureFileName = "wall3.jpg";
 //    final String textureFileName = "HSHLLogo2.jpg";
 
     private ShaderProgram shaderProgram0;
@@ -185,11 +185,16 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
 
         // Initialize objects to be drawn (see respective sub-methods)
 
+        float[] lightPos = {0f, 3f, 0f};
+        float[] color= {1f,1f,1f};
+
+        initObject0(gl, 0.4f, 0.5f, 0.2f, color);
+
         // Specify light parameters
         float[] lightPosition = {0.0f, 3.0f, 3.0f, 1.0f};
-        float[] lightAmbientColor = {0.2f, 0.25f, 0.4f, 1f};
-        float[] lightDiffuseColor = {0.2f, 0.25f, 0.3f, 1f};
-        float[] lightSpecularColor = {0.4f, 0.6f, 0.5f, 0.6f};
+        float[] lightAmbientColor = {0.1f, 0.25f, 0.4f, 1f};
+        float[] lightDiffuseColor = {0.1f, 0.25f, 0.3f, 1f};
+        float[] lightSpecularColor = {0.1f, 0.3f, 0.5f, 0.6f};
         light0 = new LightSource(lightPosition, lightAmbientColor,
                 lightDiffuseColor, lightSpecularColor);
         // END: Preparing scene
@@ -284,8 +289,8 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
 
             texture.setTexParameteri(gl, gl.GL_TEXTURE_MIN_FILTER, gl.GL_LINEAR);
             texture.setTexParameteri(gl, gl.GL_TEXTURE_MAG_FILTER, gl.GL_LINEAR);
-            texture.setTexParameteri(gl, gl.GL_TEXTURE_WRAP_S, gl.GL_CLAMP_TO_EDGE);
-            texture.setTexParameteri(gl, gl.GL_TEXTURE_WRAP_T, gl.GL_CLAMP_TO_EDGE);
+            texture.setTexParameteri(gl, gl.GL_TEXTURE_WRAP_S, gl.GL_REPEAT);
+            texture.setTexParameteri(gl, gl.GL_TEXTURE_WRAP_T, gl.GL_REPEAT);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -341,39 +346,20 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
 //        pmvMatrix.glTranslatef(1f, 0f, 0f);
 
         // Position of one light for all shapes
-        float[] lightPos = {0f, 3f, 0f};
-        float[] color= {1f,1f,1f};
 
-        pmvMatrix.glPushMatrix();
-        pmvMatrix.glTranslatef(0f, 0f, 0f);
-        displayObject0(gl, lightPos, 0.4f, 0.5f, 0.2f, color);
-        pmvMatrix.glPopMatrix();
+
+        float[] lightPos = {0f, 3f, 0f};
 
 
        pmvMatrix.glPushMatrix();
-       pmvMatrix.glTranslatef(2.5f, 0f, 0f);
-       displayObject0(gl, lightPos, 2f,  2f, 3f, color);
+       pmvMatrix.glTranslatef(-2, 0,-1.5f);
+       displayObject0(gl, lightPos, 0.4f, 0.4f, 0.4f, lightPos);
        pmvMatrix.glPopMatrix();
 
-       //pmvMatrix.glPushMatrix();
-       //pmvMatrix.glTranslatef(0, 0,-1.5f);
-       //displayObject0(gl, lightPos);
-       //pmvMatrix.glPopMatrix();
-
-       //pmvMatrix.glPushMatrix();
-       //pmvMatrix.glTranslatef(-.6f, 0,-1.5f);
-       //displayObject0(gl, lightPos);
-       //pmvMatrix.glPopMatrix();
-
-       //pmvMatrix.glPushMatrix();
-       //pmvMatrix.glTranslatef(-2, 0,-1.5f);
-       //displayObject0(gl, lightPos);
-       //pmvMatrix.glPopMatrix();
-
-       //pmvMatrix.glPushMatrix();
-       //pmvMatrix.glTranslatef(-.1f, 0,-1f);
-       //displayObject0(gl, lightPos);
-       //pmvMatrix.glPopMatrix();
+       pmvMatrix.glPushMatrix();
+       pmvMatrix.glTranslatef(-1f, 0,-1f);
+        displayObject0(gl, lightPos, 0.8f, 0.4f, 0.4f, lightPos);
+       pmvMatrix.glPopMatrix();
 
        //pmvMatrix.glPushMatrix();
        //pmvMatrix.glTranslatef(0, 0,-1);
@@ -410,7 +396,6 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
 
     private void displayObject0(GL3 gl, float[] lightPos, float width, float height, float depth, float[] color) {
         // BEGIN: Draw the second object (object 1)
-        initObject0(gl, width, height, depth, color);
         gl.glUseProgram(shaderProgram0.getShaderProgramID());
         // Transfer the PVM-Matrix (model-view and projection matrix) to the vertex shader
         gl.glUniformMatrix4fv(0, 1, false, pmvMatrix.glGetPMatrixf());
