@@ -83,6 +83,7 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
     final String floorTextureName = "dwayne_rock.jpg";
 
     private ShaderProgram shaderProgram0;
+    private ShaderProgram shaderProgram;
 
     // Pointers (names) for data transfer and handling on GPU
     private int[] vaoName;  // Name of vertex array object
@@ -101,6 +102,7 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
     private PMVMatrix pmvMatrix;
 
     private int noOfObjects;
+    private int noOfWalls;
     private float[] wallPos;
 
     /**
@@ -216,7 +218,8 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
         };
 
         // BEGIN: Allocating vertex array objects and buffers for each object
-        noOfObjects = wallSizes.length/3;
+        noOfWalls = wallSizes.length/3;
+        noOfObjects = noOfWalls + 1;
         // create vertex array objects for noOfObjects objects (VAO)
         vaoName = new int[noOfObjects];
         gl.glGenVertexArrays(noOfObjects, vaoName, 0);
@@ -237,9 +240,10 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
         // END: Allocating vertex array objects and buffers for each object
 
         // Initialize objects to be drawn (see respective sub-methods)
-        for (int i = 0; i < noOfObjects; i++) {
+        for (int i = 0; i < noOfWalls; i++) {
                 initObject(gl, wallSizes[i * 3], wallSizes[i * 3 + 1], wallSizes[i * 3 + 2], i);
         }
+        initFloor(gl, 400, 1, 400, 21);
 
         // Specify light parameters
         float[] lightPosition = {0.0f, 3.0f, 3.0f, 1.0f};
@@ -256,10 +260,6 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
 //        gl.glCullFace(GL.GL_FRONT);
         // Switch on depth test
         gl.glEnable(GL.GL_DEPTH_TEST);
-
-        // defining polygon drawing mode
-//        gl.glPolygonMode(GL.GL_FRONT_AND_BACK, gl.GL_FILL);
-//        gl.glPolygonMode(GL.GL_FRONT_AND_BACK, gl.GL_LINE);
 
         // Create projection-model-view matrix
         pmvMatrix = new PMVMatrix();
@@ -363,6 +363,91 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
         // END: Prepare cube for drawing
     }
 
+    private void initFloor(GL3 gl, float width,float height, float depth, int i) {
+        // BEGIN: Prepare cube for drawing (object 1)
+        float[] color= {1f, 1f, 1f, 1f};
+        gl.glBindVertexArray(vaoName[i]);
+        shaderProgram = new ShaderProgram(gl);
+        shaderProgram.loadShaderAndCreateProgram(shaderPath,
+                vertexShader0FileName, fragmentShader0FileName);
+
+        float[] cubeVertices = BoxTex.makeBoxVertices(width, height, depth, color);
+        int[] cubeIndices = BoxTex.makeBoxIndicesForTriangleStrip();
+
+        // activate and initialize vertex buffer object (VBO)
+        gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboName[i]);
+        // floats use 4 bytes in Java
+        gl.glBufferData(GL.GL_ARRAY_BUFFER, cubeVertices.length * 4L,
+                FloatBuffer.wrap(cubeVertices), GL.GL_STATIC_DRAW);
+
+        // activate and initialize index buffer object (IBO)
+        gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, iboName[i]);
+        // integers use 4 bytes in Java
+        gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, cubeIndices.length * 4L,
+                IntBuffer.wrap(cubeIndices), GL.GL_STATIC_DRAW);
+
+        // Activate and order vertex buffer object data for the vertex shader
+        // The vertex buffer contains: position (3), color (3), normals (3)
+        // Defining input for vertex shader
+        // Pointer for the vertex shader to the position information per vertex
+        gl.glEnableVertexAttribArray(0);
+        gl.glVertexAttribPointer(0, 3, GL.GL_FLOAT, false, 11*4, 0);
+        // Pointer for the vertex shader to the color information per vertex
+        gl.glEnableVertexAttribArray(1);
+        gl.glVertexAttribPointer(1, 3, GL.GL_FLOAT, false, 11*4, 3*4);
+        // Pointer for the vertex shader to the normal information per vertex
+        gl.glEnableVertexAttribArray(2);
+        gl.glVertexAttribPointer(2, 3, GL.GL_FLOAT, false, 11*4, 6*4);
+        // Pointer for the vertex shader to the texture coordinates information per vertex
+        gl.glEnableVertexAttribArray(3);
+        gl.glVertexAttribPointer(3, 2, GL.GL_FLOAT, false, 11*4, 9*4);
+
+        // Specification of material parameters (blue material)
+//        float[] matEmission = {0.0f, 0.0f, 0.0f, 1.0f};
+//        float[] matAmbient =  {0.0f, 0.0f, 0.1f, 1.0f};
+//        float[] matDiffuse =  {0.1f, 0.2f, 0.7f, 1.0f};
+//        float[] matSpecular = {0.7f, 0.7f, 0.7f, 1.0f};
+//        float matShininess = 200.0f;
+
+        // Metallic material
+        float[] matEmission = {0.0f, 0.0f, 0.0f, 1.0f};
+        float[] matAmbient =  {0.4f, 0.4f, 0.4f, 1.0f};
+        float[] matDiffuse =  {0.5f, 0.5f, 0.5f, 1.0f};
+        float[] matSpecular = {0.4f, 0.6f, 0.8f, 1.0f};
+        float matShininess = 1.0f;
+
+        material0 = new Material(matEmission, matAmbient, matDiffuse, matSpecular, matShininess);
+
+        // Load and prepare texture
+        Texture texture2 = null;
+        try {
+            File textureFile2 = new File(texturePath + textureFileName);
+            texture2 = TextureIO.newTexture(textureFile2, true);
+
+            texture2.setTexParameteri(gl, gl.GL_TEXTURE_MIN_FILTER, gl.GL_LINEAR);
+            texture2.setTexParameteri(gl, gl.GL_TEXTURE_MAG_FILTER, gl.GL_LINEAR);
+            texture2.setTexParameteri(gl, gl.GL_TEXTURE_WRAP_S, gl.GL_REPEAT);
+            texture2.setTexParameteri(gl, gl.GL_TEXTURE_WRAP_T, gl.GL_REPEAT);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (texture2 != null)
+            System.out.println("Texture loaded successfully from: " + texturePath + textureFileName);
+        else
+            System.err.println("Error loading textue.");
+        System.out.println("  Texture height: " + texture2.getImageHeight());
+        System.out.println("  Texture width: " + texture2.getImageWidth());
+        System.out.println("  Texture object: " + texture2.getTextureObject(gl));
+        System.out.println("  Estimated memory size of texture: " + texture2.getEstimatedMemorySize());
+
+        texture2.enable(gl);
+        // Activate texture in slot 0 (might have to go to "display()")
+        gl.glActiveTexture(GL_TEXTURE0);
+        // Use texture as 2D texture (might have to go to "display()")
+        gl.glBindTexture(GL_TEXTURE_2D, texture2.getTextureObject(gl));
+        // END: Prepare cube for drawing
+    }
+
     /**
      * Implementation of the OpenGL EventListener (GLEventListener) method
      * called by the OpenGL animator for every frame.
@@ -395,14 +480,12 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
         pmvMatrix.glRotatef(interactionHandler.getAngleYaxis(), 0f, 1f, 0f);
 
         //Place all walls
-        for(int i = 0; i<noOfObjects; i++) {
+        for(int i = 0; i < noOfWalls; i++) {
             pmvMatrix.glPushMatrix();
-            pmvMatrix.glTranslatef(wallPos[i*3], wallPos[i*3+1],wallPos[i*3+2]);
+            pmvMatrix.glTranslatef(wallPos[i * 3], wallPos[i * 3 + 1], wallPos[i * 3 + 2]);
             displayObject(gl, i);
             pmvMatrix.glPopMatrix();
         }
-
-
     }
 
     private void displayObject(GL3 gl, int i) {

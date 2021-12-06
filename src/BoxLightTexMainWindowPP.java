@@ -111,7 +111,7 @@ public class BoxLightTexMainWindowPP extends JFrame {
         splitPane.setRightComponent(glPanel);
         glPanel.add(canvas);
 
-        JPanel webcamDisplay = new Camera().webcamDisplay();
+        JPanel webcamDisplay = new Camera().getPanel();
         menuPanel.add(webcamDisplay);
 
         // Add split pane to window

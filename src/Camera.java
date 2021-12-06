@@ -11,19 +11,31 @@ public class Camera {
     public static void main(String[] args){
     }
 
-    public JPanel webcamDisplay(){
-        Webcam webcam = Webcam.getDefault();
-        webcam.setViewSize(WebcamResolution.VGA.getSize());
+    Webcam webcam = Webcam.getDefault();
+    JPanel panel = new JPanel();
+    WebcamPanel webcamPanel;
 
-
-        WebcamPanel panel = new WebcamPanel(webcam);
-        panel.setVisible(true);
-        panel.setMirrored(true);
-
-        return panel;
+    Camera() {
+        if (webcam != null) {
+            webcam.setViewSize(WebcamResolution.VGA.getSize());
+            WebcamPanel webcamPanel = new WebcamPanel(webcam);
+            webcamPanel.setMirrored(true);
+            webcamPanel.setVisible(true);
+        }
+        else {
+            System.out.println("No webcam detected");
+        }
     }
+
     public int getWidth(JPanel size){
         return size.getWidth();
-
+    }
+    public JPanel getPanel(){
+        if (webcam != null) {
+            return webcamPanel;
+        }
+        else {
+            return panel;
+        }
     }
 }
