@@ -27,11 +27,11 @@
  */
 
 
-import java.awt.Dimension;
+import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-import javax.swing.JFrame;
+import javax.swing.*;
 
 import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLProfile;
@@ -39,11 +39,11 @@ import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.util.FPSAnimator;
 
 /**
- * Top-level class of the application displaying the OpenGL component.
- * Uses the progammable pipeline.
- * Creates a Window (JFrame) where the OpenGL Canvas is displayed in.
- * Starts an animation loop.
- * Displays content defined in the renderer class
+ * Container class of the graphics application.
+ * Creates a Window (JFrame) where the OpenGL canvas is displayed in.
+ * Starts an animation loop, which triggers the renderer.
+ *
+ * Displays a triangle using the fixed function pipeline.
  *
  * Based on a tutorial by Chua Hock-Chuan
  * http://www3.ntu.edu.sg/home/ehchua/programming/opengl/JOGL2.0.html
@@ -51,43 +51,73 @@ import com.jogamp.opengl.util.FPSAnimator;
  * and on an example by Xerxes Rånby
  * http://jogamp.org/git/?p=jogl-demos.git;a=blob;f=src/demos/es2/RawGL2ES2demo.java;hb=HEAD
  *
- * @author Karsten Lehn
- * @version 12.11.2017, 19.9.2019
+ * @author Karsten Lehn, Darius Schippritt (changes since 2021)
+ * @version 26.8.2015, 16.9.2015, 10.9.2017, 17.9.2018, 19.9.2018, 27.10.2021
  *
  */
 public class BoxLightTexMainWindowPP extends JFrame {
 
     private static final long serialVersionUID = 1L;
-    // Define constants for the top-level container
-    private static String TITLE = "Box with texture - Main Window - Programmable Pipeline";
-    private static final int CANVAS_WIDTH = 800;  // width of the drawable
-    private static final int CANVAS_HEIGHT = 600; // height of the drawable
-    private static final int FPS = 60; // animator's target frames per second
+    private static String FRAME_TITLE = "Start Code Main Window - Fixed Function Pipeline with Menu";
 
+    private static final int WINDOW_WIDTH = 1024;
+    private static final int WINDOW_HEIGHT = 768;
+
+    private static final int GLCANVAS_WIDTH = 640;  // width of the canvas
+    private static final int GLCANVAS_HEIGHT = 480; // height of the canvas
+    private static final int FRAME_RATE = 60; // target frames per seconds
+
+    public static JButton button = null;
+
+    /**
+     * Standard constructor generating a Java Swing window for displaying an OpenGL canvas.
+     */
     public BoxLightTexMainWindowPP() {
-        // Setup an OpenGL context for the Canvas
-        // Setup OpenGL to use the programmable pipeline
-        // Setting to OpenGL 3
-        GLProfile profile = GLProfile.get(GLProfile.GL3);
+        // Setup an OpenGL context for the GLCanvas
+        // Using the JOGL-Profile GL2
+        // GL2: Compatibility profile, OpenGL Versions 1.0 to 3.0
+        GLProfile profile = GLProfile.get(GLProfile.GL2);
         GLCapabilities capabilities = new GLCapabilities(profile);
-        // Enabling of multisampling
-        capabilities.setSampleBuffers(true);
-        capabilities.setNumSamples(8);
-        // Create the OpenGL rendering canvas
+
+        // Create the OpenGL Canvas for rendering content
         GLCanvas canvas = new BoxLightTexRendererPP(capabilities);
-        canvas.setPreferredSize(new Dimension(CANVAS_WIDTH, CANVAS_HEIGHT));
+        //canvas.setPreferredSize(new Dimension(GLCANVAS_WIDTH, GLCANVAS_HEIGHT));
+        //canvas.setSize(new Dimension(GLCANVAS_WIDTH, GLCANVAS_HEIGHT));
 
-        // Create an animator that drives the canvas display() at the specified
-        // frame rate.
-        final FPSAnimator animator = new FPSAnimator(canvas, FPS, true);
+        // Create an animator object for calling the display method of the GLCanvas
+        // at the defined frame rate.
+        final FPSAnimator animator = new FPSAnimator(canvas, FRAME_RATE, true);
 
-        // Create the top-level container frame
-        this.getContentPane().add(canvas);
+        // Create the window container
+        this.setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
+
+        // Create and add split pane to window
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+        splitPane.setDividerLocation(300);
+        splitPane.setEnabled(false);
+
+        // Create and add menu panel to left side of split pane
+        JPanel menuPanel = new JPanel();
+        splitPane.setLeftComponent(menuPanel);
+
+        // Create and add button to menu pane
+        button = new JButton("Click me");
+        button.addActionListener(new MenuEventHandler());
+        menuPanel.add(button);
+
+        // Create and add glpanel to right side of split pane
+        JPanel glPanel = new JPanel();
+        splitPane.setRightComponent(glPanel);
+        glPanel.add(canvas);
+
+        // Add split pane to window
+        this.getContentPane().add(splitPane);
+
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                // Use a dedicate thread to run stop() to ensure the
-                // animator stops before program exit.
+                // Thread to stop the animator
+                // before the program exits
                 new Thread() {
                     @Override
                     public void run() {
@@ -97,11 +127,15 @@ public class BoxLightTexMainWindowPP extends JFrame {
                 }.start();
             }
         });
-        this.setTitle(TITLE);
+        this.setResizable(false);
+        this.setTitle(FRAME_TITLE);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.pack();
         this.setVisible(true);
-        animator.start(); // start the animation loop	// TODO Auto-generated constructor stub
+        animator.start();
+
+        // Set canvas size to size of glpanel
+        canvas.setSize(glPanel.getSize());
 
         // OpenGL: request focus for canvas
         canvas.requestFocusInWindow();
@@ -109,10 +143,16 @@ public class BoxLightTexMainWindowPP extends JFrame {
 
     /**
      * Creates the main window and starts the program
-     * @param args Arguments are not used
+     * @param args The arguments are not used
      */
     public static void main(String[] args) {
-        new BoxLightTexMainWindowPP();
+        // Ensure thread safety
+        SwingUtilities.invokeLater(new Runnable() {
+                                       @Override
+                                       public void run() {
+                                           new BoxLightTexMainWindowPP();
+                                       }
+                                   }
+        );
     }
-
 }

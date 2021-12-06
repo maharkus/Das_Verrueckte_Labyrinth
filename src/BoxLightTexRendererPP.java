@@ -72,8 +72,6 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
     // Shader for object 0
 //    final String vertexShader0FileName = "O0_Basic.vert";
 //    final String fragmentShader0FileName = "O0_Basic.frag";
-//    private final String vertexShader0FileName = "BlinnPhongPoint.vert";
-//    private final String fragmentShader0FileName = "BlinnPhongPoint.frag";
     private final String vertexShader0FileName = "BlinnPhongPointTex.vert";
     private final String fragmentShader0FileName = "BlinnPhongPointTex.frag";
 
@@ -101,6 +99,9 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
     private InteractionHandler interactionHandler;
     // Projection model view matrix tool
     private PMVMatrix pmvMatrix;
+
+    private int noOfObjects;
+    private float[] wallPos;
 
     /**
      * Standard constructor for object creation.
@@ -162,14 +163,54 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
             System.out.println("VBO support is available");
 
         // BEGIN: Preparing scene
-        // BEGIN: Allocating vertex array objects and buffers for each object
-        float[] wallSizes = {
-                0.4f, 0.5f, 0.2f,
-                0.4f, 1.5f, 0.2f,
-                0.4f, 0.5f, 1.2f
+        float[] wallSizes = new float[]{
+                20, 50, 400,
+                40, 50, 20,
+                340, 50, 20,
+                340, 50, 20,
+                40, 50, 20,
+                20, 50, 400,
+                150, 50, 10,
+                10, 50, 150,
+                10, 50, 50,
+                50, 50, 10,
+                10, 50, 110,
+                150, 50, 10,
+                10, 50, 210,
+                10, 50, 110,
+                10, 50, 110,
+                200, 50, 10,
+                10, 50, 110,
+                150, 50, 10,
+                10, 50, 110,
+                200, 50, 10
         };
 
-        int noOfObjects = wallSizes.length/3;
+        wallPos = new float[] {
+                200, 0,-200,
+                180, 0,-220,
+                -220, 0,-220,
+                -120, 0,200,
+                -220, 0,200,
+                -220, 0,-200,
+                -200, 0,150,
+                -60, 0,10,
+                -10, 0,110,
+                -10, 0,100,
+                40, 0,100,
+                -10, 0,50,
+                90, 0,-50,
+                140, 0,100,
+                140, 0,-50,
+                0, 0,-100,
+                -10, 0,-100,
+                -200, 0,-150,
+                -60, 0,-150,
+                0, 0, -150
+        };
+
+        // BEGIN: Allocating vertex array objects and buffers for each object
+        noOfObjects = wallSizes.length/3;
         // create vertex array objects for noOfObjects objects (VAO)
         vaoName = new int[noOfObjects];
         gl.glGenVertexArrays(noOfObjects, vaoName, 0);
@@ -201,9 +242,9 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
 
         // Specify light parameters
         float[] lightPosition = {0.0f, 3.0f, 3.0f, 1.0f};
-        float[] lightAmbientColor = {0.1f, 0.25f, 0.4f, 1f};
+        float[] lightAmbientColor = {0.6f, 0.7f, 0.8f, 1f};
         float[] lightDiffuseColor = {0.1f, 0.25f, 0.3f, 1f};
-        float[] lightSpecularColor = {0.1f, 0.3f, 0.5f, 0.6f};
+        float[] lightSpecularColor = {0.3f, 0.4f, 0.5f, 0.6f};
         light0 = new LightSource(lightPosition, lightAmbientColor,
                 lightDiffuseColor, lightSpecularColor);
         // END: Preparing scene
@@ -223,7 +264,7 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
         pmvMatrix = new PMVMatrix();
 
         // Start parameter settings for the interaction handler might be called here
-        interactionHandler.setEyeZ(4);
+        interactionHandler.setEyeZ(800);
         // END: Preparing scene
     }
 
@@ -285,7 +326,7 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
         float[] matEmission = {0.0f, 0.0f, 0.0f, 1.0f};
         float[] matAmbient =  {0.2f, 0.2f, 0.2f, 1.0f};
         float[] matDiffuse =  {0.5f, 0.5f, 0.5f, 1.0f};
-        float[] matSpecular = {0.2f, 0.2f, 0.2f, 1.0f};
+        float[] matSpecular = {0.2f, 0.2f, 0.4f, 1.0f};
         float matShininess = 1.0f;
 
         material0 = new Material(matEmission, matAmbient, matDiffuse, matSpecular, matShininess);
@@ -351,22 +392,13 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
         pmvMatrix.glRotatef(interactionHandler.getAngleXaxis(), 1f, 0f, 0f);
         pmvMatrix.glRotatef(interactionHandler.getAngleYaxis(), 0f, 1f, 0f);
 
-        // Transform for the complete scene
-
-       pmvMatrix.glPushMatrix();
-       pmvMatrix.glTranslatef(-2, 0,-1.5f);
-       displayObject(gl, 0);
-       pmvMatrix.glPopMatrix();
-
-       pmvMatrix.glPushMatrix();
-       pmvMatrix.glTranslatef(-1f, 0,-1f);
-       displayObject(gl, 1);
-       pmvMatrix.glPopMatrix();
-
-       pmvMatrix.glPushMatrix();
-       pmvMatrix.glTranslatef(0, 0,-1);
-       displayObject(gl, 2);
-       pmvMatrix.glPopMatrix();
+        //Place all walls
+        for(int i=0; i<noOfObjects; i++) {
+            pmvMatrix.glPushMatrix();
+            pmvMatrix.glTranslatef(wallPos[i*3], wallPos[i*3+1],wallPos[i*3+2]);
+            displayObject(gl, i);
+            pmvMatrix.glPopMatrix();
+        }
 
 
     }
