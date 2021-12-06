@@ -80,7 +80,7 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
     private final String texturePath = ".\\resources\\";
 //    final String textureFileName = "GelbGruenPalette.png";
     final String textureFileName = "wall3.jpg";
-//    final String textureFileName = "HSHLLogo2.jpg";
+    final String floorTextureName = "dwayne_rock.jpg";
 
     private ShaderProgram shaderProgram0;
 
@@ -164,49 +164,55 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
 
         // BEGIN: Preparing scene
         float[] wallSizes = new float[]{
-                20, 50, 400,
-                40, 50, 20,
-                340, 50, 20,
-                340, 50, 20,
-                40, 50, 20,
-                20, 50, 400,
-                150, 50, 10,
-                10, 50, 150,
-                10, 50, 50,
-                50, 50, 10,
+                200, 50, 10,
                 10, 50, 110,
-                150, 50, 10,
-                10, 50, 210,
-                10, 50, 110,
+                130, 50, 10,
                 10, 50, 110,
                 200, 50, 10,
                 10, 50, 110,
+                10, 50, 110,
+                10, 50, 210,
                 150, 50, 10,
                 10, 50, 110,
-                200, 50, 10
+                50, 50, 10,
+                10, 50, 50,
+                10, 50, 130,
+                130, 50, 10,
+
+                //Outer walls
+                20, 50, 400,
+                40, 50, 20,
+                340, 50, 20,
+                340, 50, 20,
+                40, 50, 20,
+                20, 50, 400,
+                420, 1, 440,
         };
 
         wallPos = new float[] {
-                200, 0,-200,
-                180, 0,-220,
-                -220, 0,-220,
-                -120, 0,200,
-                -220, 0,200,
-                -220, 0,-200,
-                -200, 0,150,
-                -60, 0,10,
-                -10, 0,110,
-                -10, 0,100,
-                40, 0,100,
-                -10, 0,50,
-                90, 0,-50,
-                140, 0,100,
-                140, 0,-50,
-                0, 0,-100,
-                -10, 0,-100,
-                -200, 0,-150,
-                -60, 0,-150,
-                0, 0, -150
+                90, 0, -150,
+                -60, 0, -100,
+                -125, 0, -150,
+                -10, 0, -50,
+                90, 0, -100,
+                140, 0, 0,
+                140, 0, 150,
+                90, 0, 50,
+                60, 0, 50,
+                40, 0, 150,
+                20, 0, 100,
+                -10, 0, 120,
+                -60, 0, 90,
+                -125, 0, 150,
+
+                //Outer walls
+                -200, 0, 0,
+                190, 0, -210,
+                -40, 0, -210,
+                40, 0, 210,
+                -190, 0, 210,
+                200, 0, 0,
+                0, -25, 0
         };
 
         // BEGIN: Allocating vertex array objects and buffers for each object
@@ -231,13 +237,8 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
         // END: Allocating vertex array objects and buffers for each object
 
         // Initialize objects to be drawn (see respective sub-methods)
-
-        float[] color= {1f,1f,1f, 1f};
-
-
-
-        for (int i = 0; i<noOfObjects;i++) {
-            initObject(gl, wallSizes[i*3], wallSizes[i*3+1], wallSizes[i*3+2], color, i);
+        for (int i = 0; i < noOfObjects; i++) {
+                initObject(gl, wallSizes[i * 3], wallSizes[i * 3 + 1], wallSizes[i * 3 + 2], i);
         }
 
         // Specify light parameters
@@ -277,8 +278,9 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
      * Initializes the GPU for drawing object1
      * @param gl OpenGL context
      */
-    private void initObject(GL3 gl, float width,float height, float depth,  float[] color, int i) {
+    private void initObject(GL3 gl, float width,float height, float depth, int i) {
         // BEGIN: Prepare cube for drawing (object 1)
+        float[] color= {1f, 1f, 1f, 1f};
         gl.glBindVertexArray(vaoName[i]);
         shaderProgram0 = new ShaderProgram(gl);
         shaderProgram0.loadShaderAndCreateProgram(shaderPath,
@@ -290,13 +292,13 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
         // activate and initialize vertex buffer object (VBO)
         gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboName[i]);
         // floats use 4 bytes in Java
-        gl.glBufferData(GL.GL_ARRAY_BUFFER, cubeVertices.length * 4,
+        gl.glBufferData(GL.GL_ARRAY_BUFFER, cubeVertices.length * 4L,
                 FloatBuffer.wrap(cubeVertices), GL.GL_STATIC_DRAW);
 
         // activate and initialize index buffer object (IBO)
         gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, iboName[i]);
         // integers use 4 bytes in Java
-        gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, cubeIndices.length * 4,
+        gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, cubeIndices.length * 4L,
                 IntBuffer.wrap(cubeIndices), GL.GL_STATIC_DRAW);
 
         // Activate and order vertex buffer object data for the vertex shader
@@ -324,9 +326,9 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
 
         // Metallic material
         float[] matEmission = {0.0f, 0.0f, 0.0f, 1.0f};
-        float[] matAmbient =  {0.2f, 0.2f, 0.2f, 1.0f};
+        float[] matAmbient =  {0.4f, 0.4f, 0.4f, 1.0f};
         float[] matDiffuse =  {0.5f, 0.5f, 0.5f, 1.0f};
-        float[] matSpecular = {0.2f, 0.2f, 0.4f, 1.0f};
+        float[] matSpecular = {0.4f, 0.6f, 0.8f, 1.0f};
         float matShininess = 1.0f;
 
         material0 = new Material(matEmission, matAmbient, matDiffuse, matSpecular, matShininess);
@@ -334,7 +336,7 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
         // Load and prepare texture
         Texture texture = null;
         try {
-            File textureFile = new File(texturePath+textureFileName);
+            File textureFile = new File(texturePath + textureFileName);
             texture = TextureIO.newTexture(textureFile, true);
 
             texture.setTexParameteri(gl, gl.GL_TEXTURE_MIN_FILTER, gl.GL_LINEAR);
@@ -385,15 +387,15 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
         pmvMatrix.glMatrixMode(PMVMatrix.GL_MODELVIEW);
         pmvMatrix.glLoadIdentity();
         // Setting the camera position, based on user input
-        pmvMatrix.gluLookAt(0f, 0f, interactionHandler.getEyeZ(),
+        pmvMatrix.gluLookAt(0f, 700f, 0,
                 0f, 0f, 0f,
-                0f, 1.0f, 0f);
+                0f, 0f, -1f);
         pmvMatrix.glTranslatef(interactionHandler.getxPosition(), interactionHandler.getyPosition(), 0f);
         pmvMatrix.glRotatef(interactionHandler.getAngleXaxis(), 1f, 0f, 0f);
         pmvMatrix.glRotatef(interactionHandler.getAngleYaxis(), 0f, 1f, 0f);
 
         //Place all walls
-        for(int i=0; i<noOfObjects; i++) {
+        for(int i = 0; i<noOfObjects; i++) {
             pmvMatrix.glPushMatrix();
             pmvMatrix.glTranslatef(wallPos[i*3], wallPos[i*3+1],wallPos[i*3+2]);
             displayObject(gl, i);
