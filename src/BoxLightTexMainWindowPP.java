@@ -33,6 +33,7 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.*;
 
+import com.github.sarxos.webcam.WebcamResolution;
 import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLCanvas;
@@ -60,8 +61,8 @@ public class BoxLightTexMainWindowPP extends JFrame {
     private static final long serialVersionUID = 1L;
     private static String FRAME_TITLE = "Start Code Main Window - Fixed Function Pipeline with Menu";
 
-    private static final int WINDOW_WIDTH = 1024;
-    private static final int WINDOW_HEIGHT = 768;
+    private static final int WINDOW_WIDTH = 1920;
+    private static final int WINDOW_HEIGHT = 1080;
 
     private static final int GLCANVAS_WIDTH = 640;  // width of the canvas
     private static final int GLCANVAS_HEIGHT = 480; // height of the canvas
@@ -93,7 +94,7 @@ public class BoxLightTexMainWindowPP extends JFrame {
 
         // Create and add split pane to window
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-        splitPane.setDividerLocation(300);
+        splitPane.setDividerLocation(500);
         splitPane.setEnabled(false);
 
         // Create and add menu panel to left side of split pane
@@ -101,14 +102,17 @@ public class BoxLightTexMainWindowPP extends JFrame {
         splitPane.setLeftComponent(menuPanel);
 
         // Create and add button to menu pane
-        button = new JButton("Click me");
-        button.addActionListener(new MenuEventHandler());
-        menuPanel.add(button);
+        //button = new JButton("Click me");
+        //button.addActionListener(new MenuEventHandler());
+        //menuPanel.add(button);
 
         // Create and add glpanel to right side of split pane
         JPanel glPanel = new JPanel();
         splitPane.setRightComponent(glPanel);
         glPanel.add(canvas);
+
+        JPanel webcamDisplay = new Camera().webcamDisplay();
+        menuPanel.add(webcamDisplay);
 
         // Add split pane to window
         this.getContentPane().add(splitPane);
@@ -154,5 +158,6 @@ public class BoxLightTexMainWindowPP extends JFrame {
                                        }
                                    }
         );
+
     }
 }
