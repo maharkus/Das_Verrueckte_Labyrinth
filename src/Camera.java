@@ -11,14 +11,14 @@ public class Camera {
     public static void main(String[] args){
     }
 
-    Webcam webcam = Webcam.getDefault();
     JPanel panel = new JPanel();
     WebcamPanel webcamPanel;
+    Webcam webcam;
 
-    Camera() {
+    Camera(Webcam webcam) {
+        this.webcamPanel = new WebcamPanel(webcam);
         if (webcam != null) {
             webcam.setViewSize(WebcamResolution.VGA.getSize());
-            WebcamPanel webcamPanel = new WebcamPanel(webcam);
             webcamPanel.setMirrored(true);
             webcamPanel.setVisible(true);
         }

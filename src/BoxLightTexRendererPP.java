@@ -26,10 +26,13 @@
  * or implied, of JogAmp Community.
  */
 
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.security.Key;
 
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.awt.GLCanvas;
@@ -104,6 +107,9 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
     private int noOfObjects;
     private int noOfWalls;
     private float[] wallPos;
+
+    private float dx;
+    private float dy;
 
     /**
      * Standard constructor for object creation.
@@ -470,12 +476,14 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
         pmvMatrix.glMatrixMode(PMVMatrix.GL_MODELVIEW);
         pmvMatrix.glLoadIdentity();
         // Setting the camera position, based on user input
-        pmvMatrix.gluLookAt(0f, 700f, 0,
-                0f, 0f, 0f,
-                0f, 0f, -1f);
-        pmvMatrix.glTranslatef(interactionHandler.getxPosition(), interactionHandler.getyPosition(), 0f);
+        pmvMatrix.gluLookAt(
+                0f + dx, 0f, 0f,
+                -400f  + dx, 30f, -400f,
+                0f, 1f, 0f);
+        pmvMatrix.glTranslatef(interactionHandler.getxPosition(), interactionHandler.getyPosition(), 1f);
         pmvMatrix.glRotatef(interactionHandler.getAngleXaxis(), 1f, 0f, 0f);
         pmvMatrix.glRotatef(interactionHandler.getAngleYaxis(), 0f, 1f, 0f);
+
 
         //Place all walls
         for(int i = 0; i < noOfWalls; i++) {

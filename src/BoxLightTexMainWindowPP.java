@@ -35,11 +35,23 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.*;
 
+import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamResolution;
 import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.util.FPSAnimator;
+import de.hshl.obj.loader.OBJLoader;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.PropertyResourceBundle;
+import java.util.ResourceBundle;
+
+import de.hshl.obj.loader.Resource;
+import de.hshl.obj.loader.objects.Mesh;
+import de.hshl.obj.loader.objects.SurfaceObject;
 
 /**
  * Container class of the graphics application.
@@ -143,22 +155,22 @@ public class BoxLightTexMainWindowPP extends JFrame {
     }
 
     public void createCameraView(JPanel menuPanel) {
-        Camera webcam = new Camera();
 
-        if(webcam.hasCamera()) {
+        if(Webcam.getDefault()!=null) {
+            Camera webcam = new Camera(Webcam.getDefault());
             menuPanel.add(webcam.getPanel());
         }
         else {
-            menuPanel.setLayout(new GridLayout(3,1));
-            noCameraText = new JLabel("Es wurde keine Kamera erkannt!");
-            noCameraText.setHorizontalAlignment(SwingConstants.CENTER);
-            button = new JButton("Erneut versuchen");
-            button.addActionListener(e -> {
-                System.out.println("Attempt to find camera again");
-                createCameraView(menuPanel);
-            });
-            menuPanel.add(noCameraText);
-            menuPanel.add(button);
+           menuPanel.setLayout(new GridLayout(3,1));
+           noCameraText = new JLabel("Es wurde keine Kamera erkannt!");
+           noCameraText.setHorizontalAlignment(SwingConstants.CENTER);
+           button = new JButton("Erneut versuchen");
+           button.addActionListener(e -> {
+               System.out.println("Attempt to find camera again");
+               createCameraView(menuPanel);
+           });
+           menuPanel.add(noCameraText);
+           menuPanel.add(button);
         }
     }
 
@@ -166,12 +178,24 @@ public class BoxLightTexMainWindowPP extends JFrame {
      * Creates the main window and starts the program
      * @param args The arguments are not used
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+
+        try {
+            OBJLoader mesh = new OBJLoader();
+            System.out.println("Mesh: " + mesh.loadMesh(Resource.file(Paths.get("resources\\triangle.obj"))));
+        }
+        catch (IOException exception){
+            exception.printStackTrace(); // print the exception to the terminal
+            System.exit(1); // stop the java application since there was an
+        }
+
+
         // Ensure thread safety
         SwingUtilities.invokeLater(new Runnable() {
                                        @Override
                                        public void run() {
                                            new BoxLightTexMainWindowPP();
+
                                        }
                                    }
         );
