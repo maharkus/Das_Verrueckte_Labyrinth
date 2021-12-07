@@ -28,6 +28,8 @@
 
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -107,19 +109,7 @@ public class BoxLightTexMainWindowPP extends JFrame {
         splitPane.setRightComponent(glPanel);
         glPanel.add(canvas);
 
-        Camera webcam = new Camera();
-        if(webcam.hasCamera()) {
-            menuPanel.add(webcam.getPanel());
-        }
-        else {
-            menuPanel.setLayout(new GridLayout(3,1));
-            noCameraText = new JLabel("Es wurde keine Kamera erkannt!");
-            noCameraText.setHorizontalAlignment(SwingConstants.CENTER);
-            button = new JButton("Click me");
-            button.addActionListener(new MenuEventHandler());
-            menuPanel.add(noCameraText);
-            menuPanel.add(button);
-        }
+        createCameraView(menuPanel);
 
         // Add split pane to window
         this.getContentPane().add(splitPane);
@@ -150,6 +140,26 @@ public class BoxLightTexMainWindowPP extends JFrame {
 
         // OpenGL: request focus for canvas
         canvas.requestFocusInWindow();
+    }
+
+    public void createCameraView(JPanel menuPanel) {
+        Camera webcam = new Camera();
+
+        if(webcam.hasCamera()) {
+            menuPanel.add(webcam.getPanel());
+        }
+        else {
+            menuPanel.setLayout(new GridLayout(3,1));
+            noCameraText = new JLabel("Es wurde keine Kamera erkannt!");
+            noCameraText.setHorizontalAlignment(SwingConstants.CENTER);
+            button = new JButton("Erneut versuchen");
+            button.addActionListener(e -> {
+                System.out.println("Attempt to find camera again");
+                createCameraView(menuPanel);
+            });
+            menuPanel.add(noCameraText);
+            menuPanel.add(button);
+        }
     }
 
     /**

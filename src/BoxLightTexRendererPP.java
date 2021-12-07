@@ -188,7 +188,6 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
                 340, 50, 20,
                 40, 50, 20,
                 20, 50, 400,
-                420, 1, 440,
         };
 
         wallPos = new float[] {
@@ -214,7 +213,6 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
                 40, 0, 210,
                 -190, 0, 210,
                 200, 0, 0,
-                0, -25, 0
         };
 
         // BEGIN: Allocating vertex array objects and buffers for each object
@@ -243,7 +241,7 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
         for (int i = 0; i < noOfWalls; i++) {
                 initObject(gl, wallSizes[i * 3], wallSizes[i * 3 + 1], wallSizes[i * 3 + 2], i);
         }
-        initFloor(gl, 400, 1, 400, 21);
+        initFloor(gl, 400, 1, 400, noOfObjects - 1);
 
         // Specify light parameters
         float[] lightPosition = {0.0f, 3.0f, 3.0f, 1.0f};
@@ -255,7 +253,7 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
         // END: Preparing scene
 
         // Switch on back face culling
-//        gl.glEnable(GL.GL_CULL_FACE);
+        gl.glEnable(GL.GL_CULL_FACE);
         gl.glCullFace(GL.GL_BACK);
 //        gl.glCullFace(GL.GL_FRONT);
         // Switch on depth test
@@ -486,6 +484,11 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
             displayObject(gl, i);
             pmvMatrix.glPopMatrix();
         }
+
+        pmvMatrix.glPushMatrix();
+        pmvMatrix.glTranslatef(0, -25, 0);
+        displayObject(gl, noOfObjects - 1);
+        pmvMatrix.glPopMatrix();
     }
 
     private void displayObject(GL3 gl, int i) {
@@ -510,7 +513,7 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
         gl.glBindVertexArray(vaoName[i]);
 
         // Draws the elements in the order defined by the index buffer object (IBO)
-        gl.glDrawElements(GL.GL_TRIANGLE_STRIP, BoxTex.noOfIndicesForBox(), GL.GL_UNSIGNED_INT, i);
+        gl.glDrawElements(GL.GL_TRIANGLE_STRIP, BoxTex.noOfIndicesForBox(), GL.GL_UNSIGNED_INT, 0);
     }
 
 
