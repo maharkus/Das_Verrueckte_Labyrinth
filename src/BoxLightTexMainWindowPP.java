@@ -69,6 +69,7 @@ public class BoxLightTexMainWindowPP extends JFrame {
     private static final int FRAME_RATE = 60; // target frames per seconds
 
     public static JButton button = null;
+    public static JLabel noCameraText = null;
 
     /**
      * Standard constructor generating a Java Swing window for displaying an OpenGL canvas.
@@ -101,18 +102,24 @@ public class BoxLightTexMainWindowPP extends JFrame {
         JPanel menuPanel = new JPanel();
         splitPane.setLeftComponent(menuPanel);
 
-        // Create and add button to menu pane
-        //button = new JButton("Click me");
-        //button.addActionListener(new MenuEventHandler());
-        //menuPanel.add(button);
-
         // Create and add glpanel to right side of split pane
         JPanel glPanel = new JPanel();
         splitPane.setRightComponent(glPanel);
         glPanel.add(canvas);
 
-        JPanel webcamDisplay = new Camera().getPanel();
-        menuPanel.add(webcamDisplay);
+        Camera webcam = new Camera();
+        if(webcam.hasCamera()) {
+            menuPanel.add(webcam.getPanel());
+        }
+        else {
+            menuPanel.setLayout(new GridLayout(3,1));
+            noCameraText = new JLabel("Es wurde keine Kamera erkannt!");
+            noCameraText.setHorizontalAlignment(SwingConstants.CENTER);
+            button = new JButton("Click me");
+            button.addActionListener(new MenuEventHandler());
+            menuPanel.add(noCameraText);
+            menuPanel.add(button);
+        }
 
         // Add split pane to window
         this.getContentPane().add(splitPane);

@@ -27,15 +27,16 @@ public class Camera {
         }
     }
 
+    public boolean hasCamera() {
+        return webcam != null;
+    }
+
+
+    public JPanel getPanel(){
+        return webcamPanel;
+    }
+
     public int getWidth(JPanel size){
         return size.getWidth();
-    }
-    public JPanel getPanel(){
-        if (webcam != null) {
-            return webcamPanel;
-        }
-        else {
-            return panel;
-        }
     }
 }
