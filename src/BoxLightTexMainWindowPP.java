@@ -178,18 +178,8 @@ public class BoxLightTexMainWindowPP extends JFrame {
      * Creates the main window and starts the program
      * @param args The arguments are not used
      */
+
     public static void main(String[] args) throws IOException {
-
-        try {
-            OBJLoader mesh = new OBJLoader();
-            System.out.println("Mesh: " + mesh.loadMesh(Resource.file(Paths.get("resources\\triangle.obj"))));
-        }
-        catch (IOException exception){
-            exception.printStackTrace(); // print the exception to the terminal
-            System.exit(1); // stop the java application since there was an
-        }
-
-
         // Ensure thread safety
         SwingUtilities.invokeLater(new Runnable() {
                                        @Override
