@@ -16,7 +16,6 @@ public class Camera {
     Webcam webcam;
 
     Camera(Webcam webcam) {
-        this.webcamPanel = new WebcamPanel(webcam);
         if (webcam != null) {
             webcam.setViewSize(WebcamResolution.VGA.getSize());
             webcamPanel.setMirrored(true);
@@ -25,6 +24,7 @@ public class Camera {
         else {
             System.out.println("No webcam detected");
         }
+        this.webcamPanel = new WebcamPanel(webcam);
     }
 
     public boolean hasCamera() {

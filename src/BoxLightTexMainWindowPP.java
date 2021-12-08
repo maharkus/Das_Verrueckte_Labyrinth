@@ -178,7 +178,6 @@ public class BoxLightTexMainWindowPP extends JFrame {
      * Creates the main window and starts the program
      * @param args The arguments are not used
      */
-
     public static void main(String[] args) throws IOException {
         // Ensure thread safety
         SwingUtilities.invokeLater(new Runnable() {
