@@ -468,8 +468,6 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
         catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-        System.out.println("MESH: " + Arrays.toString(skullVertices));
         // Create and activate a vertex array object (VAO)
 
         gl.glBindVertexArray(vaoName[i]);
@@ -589,10 +587,15 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
         // Using the PMV-Tool for geometric transforms
         pmvMatrix.glMatrixMode(PMVMatrix.GL_MODELVIEW);
         pmvMatrix.glLoadIdentity();
+
+        Player player = new Player(new float[]{-200f, 25f, 200f}, new float[]{-200f, 25f, 190f});
+
+
+
         // Setting the camera position, based on user input
-        pmvMatrix.gluLookAt(0f, 200f, 0,
-                0f, 0f, 0f,
-                0f, 0f, -1f);
+        pmvMatrix.gluLookAt(player.getPositionX(), player.getPositionY(), player.getPositionZ(),
+                player.getPositionX(), player.getPositionY(), player.getPositionZ()-10f,
+                0f, 1f, 0f);
         pmvMatrix.glTranslatef(interactionHandler.getxPosition(), interactionHandler.getyPosition(), 0f);
         pmvMatrix.glRotatef(interactionHandler.getAngleXaxis(), 1f, 0f, 0f);
         pmvMatrix.glRotatef(interactionHandler.getAngleYaxis(), 0f, 1f, 0f);
