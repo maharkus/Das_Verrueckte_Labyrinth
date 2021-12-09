@@ -41,7 +41,6 @@ import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.util.FPSAnimator;
-import de.hshl.obj.loader.OBJLoader;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -49,9 +48,7 @@ import java.nio.file.Paths;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 
-import de.hshl.obj.loader.Resource;
-import de.hshl.obj.loader.objects.Mesh;
-import de.hshl.obj.loader.objects.SurfaceObject;
+
 
 /**
  * Container class of the graphics application.
@@ -108,18 +105,20 @@ public class BoxLightTexMainWindowPP extends JFrame {
         this.setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
 
         // Create and add split pane to window
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-        splitPane.setDividerLocation(500);
-        splitPane.setEnabled(false);
+        //JFrame window = new JFrame("Das Verrückte Labyrinth");
+        JPanel splitPane = new JPanel();
+
 
         // Create and add menu panel to left side of split pane
         JPanel menuPanel = new JPanel();
-        splitPane.setLeftComponent(menuPanel);
+        menuPanel.setSize(300, 500);
+        splitPane.add(menuPanel);
 
         // Create and add glpanel to right side of split pane
         JPanel glPanel = new JPanel();
-        splitPane.setRightComponent(glPanel);
         glPanel.add(canvas);
+        splitPane.add(glPanel);
+        splitPane.add(Draw.drawRectangle());
 
         createCameraView(menuPanel);
 
@@ -159,6 +158,9 @@ public class BoxLightTexMainWindowPP extends JFrame {
         if(Webcam.getDefault()!=null) {
             Camera webcam = new Camera(Webcam.getDefault());
             menuPanel.add(webcam.getPanel());
+            menuPanel.add(Draw.drawRectangle());
+
+            System.out.println("webcamsize: " + webcam.getPanel().getSize());
         }
         else {
            menuPanel.setLayout(new GridLayout(3,1));

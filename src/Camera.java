@@ -17,14 +17,20 @@ public class Camera {
 
     Camera(Webcam webcam) {
         this.webcamPanel = new WebcamPanel(webcam);
+
+
         if (webcam != null) {
             webcam.setViewSize(WebcamResolution.VGA.getSize());
             webcamPanel.setMirrored(true);
             webcamPanel.setVisible(true);
+            //webcamPanel.add(Draw.drawRectangle());
+            this.webcamPanel = new WebcamPanel(webcam);
+
         }
         else {
             System.out.println("No webcam detected");
         }
+
     }
 
     public boolean hasCamera() {
@@ -38,5 +44,9 @@ public class Camera {
 
     public int getWidth(JPanel size){
         return size.getWidth();
+    }
+
+    public int getHeight (JPanel size) {
+        return size.getHeight();
     }
 }
