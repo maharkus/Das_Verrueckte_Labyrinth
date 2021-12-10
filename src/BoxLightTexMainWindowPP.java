@@ -70,13 +70,13 @@ import java.util.ResourceBundle;
 public class BoxLightTexMainWindowPP extends JFrame {
 
     private static final long serialVersionUID = 1L;
-    private static String FRAME_TITLE = "Start Code Main Window - Fixed Function Pipeline with Menu";
+    private static String FRAME_TITLE = "Das Verrückte Labyrinth";
 
     private static final int WINDOW_WIDTH = 1920;
     private static final int WINDOW_HEIGHT = 1080;
 
-    private static final int GLCANVAS_WIDTH = 640;  // width of the canvas
-    private static final int GLCANVAS_HEIGHT = 480; // height of the canvas
+    private static final int GlCANVAS_WIDTH = 640;  // width of the canvas
+    private static final int GlCANVAS_HEIGHT = 480; // height of the canvas
     private static final int FRAME_RATE = 60; // target frames per seconds
 
     public static JButton button = null;
@@ -104,26 +104,38 @@ public class BoxLightTexMainWindowPP extends JFrame {
         // Create the window container
         this.setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
 
-        // Create and add split pane to window
-        //JFrame window = new JFrame("Das Verrückte Labyrinth");
-        JPanel splitPane = new JPanel();
+        // Close window
+        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+
+        //Create all panels
+        JPanel canvasPanel = new JPanel();
+        JPanel cameraPanel = new JPanel();
+        JPanel rectanglePanel = new JPanel();
 
 
-        // Create and add menu panel to left side of split pane
-        JPanel menuPanel = new JPanel();
-        menuPanel.setSize(300, 500);
-        splitPane.add(menuPanel);
+        // add Canvas to CanvasPanel
+        canvasPanel.add(canvas);
+        canvasPanel.setSize(1920,1080);
 
-        // Create and add glpanel to right side of split pane
-        JPanel glPanel = new JPanel();
-        glPanel.add(canvas);
-        splitPane.add(glPanel);
-        splitPane.add(Draw.drawRectangle());
 
-        createCameraView(menuPanel);
+        // setSize of CameraPanel to Size of Camera resolution, set Location to right top and create Camera + add to cameraPanel
+        cameraPanel.setSize(640,480);
+        cameraPanel.setLocation(1280,0);
+        createCameraView(cameraPanel);
 
-        // Add split pane to window
-        this.getContentPane().add(splitPane);
+        // create rectangle and add to rectanglePanel
+        rectanglePanel.add(Draw.drawRectangle());
+        rectanglePanel.setVisible(true);
+
+        // Add Content to window
+        this.getContentPane().add(rectanglePanel);
+        this.getContentPane().add(cameraPanel);
+        this.getContentPane().add(canvasPanel);
+
+        // repaint ContentPane
+        //this.getContentPane().revalidate();
+
+        // Make Frame 
 
         this.addWindowListener(new WindowAdapter() {
             @Override
@@ -146,33 +158,34 @@ public class BoxLightTexMainWindowPP extends JFrame {
         this.setVisible(true);
         animator.start();
 
-        // Set canvas size to size of glpanel
-        canvas.setSize(glPanel.getSize());
+        // Set canvas size to size of rectanglePanel
+        canvas.setSize(1920,1080);
+        canvas.setVisible(true);
 
         // OpenGL: request focus for canvas
-        canvas.requestFocusInWindow();
+        //canvas.requestFocusInWindow();
     }
 
-    public void createCameraView(JPanel menuPanel) {
+    public void createCameraView(JPanel cameraPanel) {
 
         if(Webcam.getDefault()!=null) {
             Camera webcam = new Camera(Webcam.getDefault());
-            menuPanel.add(webcam.getPanel());
-            menuPanel.add(Draw.drawRectangle());
+            cameraPanel.add(webcam.getPanel());
+            //cameraPanel.add(Draw.drawRectangle());
 
             System.out.println("webcamsize: " + webcam.getPanel().getSize());
         }
         else {
-           menuPanel.setLayout(new GridLayout(3,1));
+           cameraPanel.setLayout(new GridLayout(3,1));
            noCameraText = new JLabel("Es wurde keine Kamera erkannt!");
            noCameraText.setHorizontalAlignment(SwingConstants.CENTER);
            button = new JButton("Erneut versuchen");
            button.addActionListener(e -> {
                System.out.println("Attempt to find camera again");
-               createCameraView(menuPanel);
+               createCameraView(cameraPanel);
            });
-           menuPanel.add(noCameraText);
-           menuPanel.add(button);
+           cameraPanel.add(noCameraText);
+           cameraPanel.add(button);
         }
     }
 

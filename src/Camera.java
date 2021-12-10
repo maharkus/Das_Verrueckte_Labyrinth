@@ -23,7 +23,6 @@ public class Camera {
             webcam.setViewSize(WebcamResolution.VGA.getSize());
             webcamPanel.setMirrored(true);
             webcamPanel.setVisible(true);
-            //webcamPanel.add(Draw.drawRectangle());
             this.webcamPanel = new WebcamPanel(webcam);
 
         }
@@ -42,11 +41,13 @@ public class Camera {
         return webcamPanel;
     }
 
-    public int getWidth(JPanel size){
-        return size.getWidth();
+    public Dimension getDimension (WebcamPanel dimension){
+        return dimension.getSize();
     }
-
     public int getHeight (JPanel size) {
         return size.getHeight();
+    }
+    public int getWidth(JPanel size){
+        return size.getWidth();
     }
 }
