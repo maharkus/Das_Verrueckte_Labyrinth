@@ -1,13 +1,11 @@
 import com.github.sarxos.webcam.Webcam;
-import com.github.sarxos.webcam.WebcamMotionDetector;
 import com.github.sarxos.webcam.WebcamPanel;
 import com.github.sarxos.webcam.WebcamResolution;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 
-public class Camera {
+public class Camera extends JPanel{
     public static void main(String[] args){
     }
 
@@ -32,6 +30,15 @@ public class Camera {
 
     }
 
+    public static Rectangle drawRectangle(){
+        Rectangle rect = new Rectangle();
+        return rect;
+    }
+
+    @Override
+    public Dimension getPreferredSize(){
+        return new Dimension(210,160);
+    }
     public boolean hasCamera() {
         return webcam != null;
     }
