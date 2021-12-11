@@ -68,7 +68,7 @@ import static com.jogamp.opengl.GL.GL_TEXTURE_2D;
  * @version 12.11.2017, 18.9.2019
  *
  */
-public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
+public class Larbrynth extends GLCanvas implements GLEventListener {
 
     private static final long serialVersionUID = 1L;
 
@@ -105,6 +105,9 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
     // Projection model view matrix tool
     private PMVMatrix pmvMatrix;
 
+
+    Player player;
+
     private int noOfObjects;
     private int noOfWalls;
     private float[] wallPos;
@@ -120,7 +123,7 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
     /**
      * Standard constructor for object creation.
      */
-    public BoxLightTexRendererPP() {
+    public Larbrynth() {
         // Create the canvas with default capabilities
         super();
         // Add this object as OpenGL event listener
@@ -132,7 +135,7 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
      * Create the canvas with the requested OpenGL capabilities
      * @param capabilities The capabilities of the canvas, including the OpenGL profile
      */
-    public BoxLightTexRendererPP(GLCapabilities capabilities) {
+    public Larbrynth(GLCapabilities capabilities) {
         // Create the canvas with the requested OpenGL capabilities
         super(capabilities);
         // Add this object as an OpenGL event listener
@@ -176,6 +179,11 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
         else
             System.out.println("VBO support is available");
 
+
+        //Create Player
+        player = new Player(new float[]{-140f, 0f, 240f}, new float[]{-140f, 0f, 200f});
+
+
         // BEGIN: Preparing scene
         float[] wallSizes = new float[]{
                 200, 50, 10,
@@ -207,7 +215,7 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
                 -60, 0, -100,
                 -125, 0, -150,
                 -10, 0, -50,
-                90, 0, -100,
+                40, 0, -100,
                 140, 0, 0,
                 140, 0, 150,
                 90, 0, 50,
@@ -588,17 +596,39 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
         pmvMatrix.glMatrixMode(PMVMatrix.GL_MODELVIEW);
         pmvMatrix.glLoadIdentity();
 
-        Player player = new Player(new float[]{-200f, 25f, 200f}, new float[]{-200f, 25f, 190f});
+        float[] newPos = new float[]{20f, 0f, 180f};
+        new java.util.Timer().schedule(
+                new java.util.TimerTask() {
+                    @Override
+                    public void run() {
+                        if(newPos[2] != player.getPosition()[2]) {
+                            player.setPosition(new float[]{player.getPosition()[0], player.getPosition()[1], player.getPosition()[2]-1});
+                        }
+                        else if(newPos[0] != player.getPosition()[0]) {
+                            player.setPosition(new float[]{player.getPosition()[0]+1, player.getPosition()[1], player.getPosition()[2]});
+                            player.setFocus(new float[]{player.getPosition()[0], player.getPosition()[1], player.getPosition()[2]});
+                        }
+                        // Setting the camera position, based on user input
+                    }
+                },
+                100
+        );
 
+        pmvMatrix.gluLookAt(player.getPosition()[0], player.getPosition()[1], player.getPosition()[2],
+                player.getPosition()[0]+1, player.getPosition()[1], player.getPosition()[2],
+                0f, 1f, 0f);
+        pmvMatrix.glRotatef(interactionHandler.getAngleXaxis(), 1f, 0f, 0f);
+        pmvMatrix.glRotatef(interactionHandler.getAngleYaxis(), 0f, 1f, 0f);
 
 
         // Setting the camera position, based on user input
-        pmvMatrix.gluLookAt(player.getPositionX(), player.getPositionY(), player.getPositionZ(),
-                player.getPositionX(), player.getPositionY(), player.getPositionZ()-10f,
-                0f, 1f, 0f);
-        pmvMatrix.glTranslatef(interactionHandler.getxPosition(), interactionHandler.getyPosition(), 0f);
-        pmvMatrix.glRotatef(interactionHandler.getAngleXaxis(), 1f, 0f, 0f);
-        pmvMatrix.glRotatef(interactionHandler.getAngleYaxis(), 0f, 1f, 0f);
+        //pmvMatrix.gluLookAt(0f, 0f, 400f,
+        //        0f, 0f, 0f,
+        //        0f, 1.0f, 0f);
+        //pmvMatrix.glTranslatef(interactionHandler.getxPosition(), interactionHandler.getyPosition(), 0f);
+        //pmvMatrix.glRotatef(interactionHandler.getAngleXaxis(), 1f, 0f, 0f);
+        //pmvMatrix.glRotatef(interactionHandler.getAngleYaxis(), 0f, 1f, 0f);
+
 
         //Place all walls
         for(int i = 0; i < noOfWalls; i++) {

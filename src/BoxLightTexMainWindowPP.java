@@ -28,30 +28,18 @@
 
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.*;
 
 import com.github.sarxos.webcam.Webcam;
-import com.github.sarxos.webcam.WebcamResolution;
 import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.util.FPSAnimator;
-import de.hshl.obj.loader.OBJLoader;
 
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.PropertyResourceBundle;
-import java.util.ResourceBundle;
-
-import de.hshl.obj.loader.Resource;
-import de.hshl.obj.loader.objects.Mesh;
-import de.hshl.obj.loader.objects.SurfaceObject;
 
 /**
  * Container class of the graphics application.
@@ -96,7 +84,7 @@ public class BoxLightTexMainWindowPP extends JFrame {
         GLCapabilities capabilities = new GLCapabilities(profile);
 
         // Create the OpenGL Canvas for rendering content
-        GLCanvas canvas = new BoxLightTexRendererPP(capabilities);
+        GLCanvas canvas = new Larbrynth(capabilities);
         //canvas.setPreferredSize(new Dimension(GLCANVAS_WIDTH, GLCANVAS_HEIGHT));
         //canvas.setSize(new Dimension(GLCANVAS_WIDTH, GLCANVAS_HEIGHT));
 

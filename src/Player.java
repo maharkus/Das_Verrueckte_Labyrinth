@@ -18,20 +18,22 @@ public class Player {
         return position;
     }
 
-    public float getPositionX() {
-        return position[0];
-    }
-
-    public float getPositionY() {
-        return position[1];
-    }
-
-    public float getPositionZ() {
-        return position[2];
-    }
-
     public void setPosition(float[] position) {
         this.position = position;
     }
+    public void setFocus(float[] position) {
+        this.focus = focus;
+    }
+
+    public float getFocusX() {
+        return focus[0];
+    }
+
+    public float getFocusY() {return focus[1]; }
+
+    public float getFocusZ() {
+        return focus[2];
+    }
+
 
 }
