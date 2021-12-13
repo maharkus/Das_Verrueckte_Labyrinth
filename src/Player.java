@@ -1,38 +1,91 @@
 public class Player {
-    float[] position;
-    float[] focus;
-    float[] directionVector = new float[3];
+    float[]position;
+    float positionX;
+    float positionY;
+    float positionZ;
+    float[]focus;
+    float focusX;
+    float focusY;
+    float focusZ;
 
 
     Player(float[] position, float[] focus) {
-        this.position = position;
-        this.focus = focus;
-        for(int i=0; i<directionVector.length; i++) {
-            directionVector[i] = this.focus[i] - this.position[i];
-        }
+        this.positionX = position[0];
+        this.positionY = position[1];
+        this.positionZ = position[2];
+        this.focusX = focus[0];
+        this.focusY = focus[1];
+        this.focusZ = focus[2];
     }
+
+    public void setPosition(float[] position) {
+        this.positionX = position[0];
+        this.positionY = position[1];
+        this.positionZ = position[2];
+
+    }
+    public void setFocus(float[] focus) {
+        this.focusX = focus[0];
+        this.focusY = focus[1];
+        this.focusZ = focus[2];
+    }
+
+
+
 
     //Getters and setters
 
     public float[] getPosition() {
-        return position;
+        return new float[]{positionX, positionY, positionZ};
     }
 
-    public void setPosition(float[] position) {
-        this.position = position;
+    public float[] getFocus() {
+        return new float[]{focusX, focusY, focusZ};
     }
-    public void setFocus(float[] position) {
-        this.focus = focus;
+
+    public float getPositionX() {
+        return positionX;
     }
+
+    public float getPositionY() {return positionY; }
+
+    public float getPositionZ() {
+        return positionZ;
+    }
+
+    public void setPositionX(float positionX) {
+        this.positionX = positionX;
+    }
+
+    public void setPositionY(float positionY) {
+        this.positionY = positionY;
+    }
+
+    public void setPositionZ(float positionZ) {
+        this.positionZ = positionZ;
+    }
+
 
     public float getFocusX() {
-        return focus[0];
+        return focusX;
     }
 
-    public float getFocusY() {return focus[1]; }
+    public float getFocusY() {return focusY; }
 
     public float getFocusZ() {
-        return focus[2];
+        return focusZ;
+    }
+
+    public void setFocusX(float focusX) {
+        this.focusX = focusX;
+    }
+
+    public void setFocusY(float focusY) {
+        this.focusY = focusY;
+    }
+
+    public void setFocusZ(float focusZ) {
+        this.focusZ = focusZ;
     }
 
 

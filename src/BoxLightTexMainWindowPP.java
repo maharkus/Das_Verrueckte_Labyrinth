@@ -128,7 +128,7 @@ public class BoxLightTexMainWindowPP extends JFrame {
                 }.start();
             }
         });
-        this.setResizable(false);
+        this.setResizable(true);
         this.setTitle(FRAME_TITLE);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.pack();

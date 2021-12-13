@@ -42,8 +42,8 @@ import com.jogamp.opengl.util.texture.TextureIO;
 import de.hshl.obj.loader.OBJLoader;
 import de.hshl.obj.loader.Resource;
 
-import static com.jogamp.opengl.GL.GL_TEXTURE0;
-import static com.jogamp.opengl.GL.GL_TEXTURE_2D;
+import static com.jogamp.opengl.GL.*;
+import static com.jogamp.opengl.GL2.GL_MAP1_VERTEX_3;
 
 /**
  * Performs the OpenGL graphics processing using the Programmable Pipeline and the
@@ -107,11 +107,15 @@ public class Larbrynth extends GLCanvas implements GLEventListener {
 
 
     Player player;
+    float[] lastPos;
+    float[] focusPos = new float[3];
+    boolean focusSet = false;
 
     private int noOfObjects;
     private int noOfWalls;
     private float[] wallPos;
-
+    float[][] curvePoints;
+    float[] newPos;
 
     final Path skullObj = Paths.get("./resources/models/Skull.obj");
     final Path boneObj = Paths.get("./resources/models/Bone.obj");
@@ -181,7 +185,9 @@ public class Larbrynth extends GLCanvas implements GLEventListener {
 
 
         //Create Player
-        player = new Player(new float[]{-140f, 0f, 240f}, new float[]{-140f, 0f, 200f});
+        player = new Player(new float[]{-155f, 0f, 240f}, new float[]{0f, 0f, 0f});
+        lastPos = player.getPosition();
+        focusPos = player.getFocus();
 
 
         // BEGIN: Preparing scene
@@ -194,7 +200,7 @@ public class Larbrynth extends GLCanvas implements GLEventListener {
                 10, 50, 110,
                 10, 50, 110,
                 10, 50, 210,
-                150, 50, 10,
+                210, 50, 10,
                 10, 50, 110,
                 50, 50, 10,
                 10, 50, 50,
@@ -219,7 +225,7 @@ public class Larbrynth extends GLCanvas implements GLEventListener {
                 140, 0, 0,
                 140, 0, 150,
                 90, 0, 50,
-                60, 0, 50,
+                40, 0, 50,
                 40, 0, 150,
                 20, 0, 100,
                 -10, 0, 120,
@@ -234,6 +240,28 @@ public class Larbrynth extends GLCanvas implements GLEventListener {
                 -190, 0, 210,
                 200, 0, 0,
         };
+
+        curvePoints = new float[][] {
+                {-15.5f, 0.5f, 22f},
+                {-15.5f, 0.5f, 18f},
+                {-6f, 0.5f, 18f},
+                {-3f, 0.5f, 18f},
+                {1.5f, 0.5f, 18f},
+                {1.5f, 0.5f, 13f},
+                {-3f, 0.5f, 8f},
+                {6.5f, 0.5f, 8f},
+                {6.5f, 0.5f, 18f},
+                {11f, 0.5f, 18f},
+                {11f, 0.5f, 8f},
+                {16.5f, 0.5f, 8f},
+                {16.5f, 0.5f, 18f}
+        };
+
+        float newPosX = curvePoints[0][0] * 10f;
+        float newPosY = curvePoints[0][1];
+        float newPosZ = curvePoints[0][2] * 10f;
+
+        newPos = new float[]{newPosX, newPosY, newPosZ};
 
         // BEGIN: Allocating vertex array objects and buffers for each object
         noOfWalls = wallSizes.length/3;
@@ -568,7 +596,19 @@ public class Larbrynth extends GLCanvas implements GLEventListener {
 
         material0 = new Material(matEmission, matAmbient, matDiffuse, matSpecular, matShininess);
     }
+    public void drawCurve(GL2 gl, float[][] curvePoints) {
 
+        gl.glEnable(GL_MAP1_VERTEX_3);
+
+        gl.glPointSize(20f);
+        gl.glColor3f(1f, 1f, 1f);
+        gl.glBegin(GL_POINTS);
+        for (float[] curvePoint : curvePoints) {
+            gl.glVertex3f(curvePoint[0], curvePoint[1], curvePoint[2]);
+        }
+
+        gl.glEnd();
+    }
 
 
 
@@ -580,6 +620,7 @@ public class Larbrynth extends GLCanvas implements GLEventListener {
     @Override
     public void display(GLAutoDrawable drawable) {
         GL3 gl = drawable.getGL().getGL3();
+        GL2 gl2 = drawable.getGL().getGL2();
         gl.glClear(GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT);
 
         // Background color of the canvas
@@ -593,42 +634,73 @@ public class Larbrynth extends GLCanvas implements GLEventListener {
                 ", y-Translation: " + interactionHandler.getyPosition());// definition of translation of model (Model/Object Coordinates --> World Coordinates)
 */
         // Using the PMV-Tool for geometric transforms
+
         pmvMatrix.glMatrixMode(PMVMatrix.GL_MODELVIEW);
         pmvMatrix.glLoadIdentity();
 
-        float[] newPos = new float[]{20f, 0f, 180f};
         new java.util.Timer().schedule(
                 new java.util.TimerTask() {
                     @Override
                     public void run() {
+                        float[] currentPos = player.getPosition();
+
                         if(newPos[2] != player.getPosition()[2]) {
-                            player.setPosition(new float[]{player.getPosition()[0], player.getPosition()[1], player.getPosition()[2]-1});
+                            focusSet = false;
+                            player.setPositionZ(player.getPositionZ() - 1);
+                            if(!focusSet) {
+                                focusPos[0] = newPos[0];
+                                focusPos[1] = newPos[1];
+                                focusPos[2] = 0;
+                                player.setFocus(focusPos);
+                                focusSet=true;
+                            }
                         }
-                        else if(newPos[0] != player.getPosition()[0]) {
-                            player.setPosition(new float[]{player.getPosition()[0]+1, player.getPosition()[1], player.getPosition()[2]});
-                            player.setFocus(new float[]{player.getPosition()[0], player.getPosition()[1], player.getPosition()[2]});
+                        else if(newPos[0] != player.getPositionX()) {
+                            focusSet = false;
+                            player.setPositionX(player.getPositionX() + 1);
+                            if(!focusSet) {
+                                focusPos[0] = 400;
+                                focusPos[1] = newPos[1];
+                                focusPos[2] = newPos[2];
+                                player.setFocus(focusPos);
+                                focusSet = true;
+                            }
                         }
-                        // Setting the camera position, based on user input
+                        else {
+
+                            float newPosX = curvePoints[2][0] * 10f;
+                            float newPosY = curvePoints[2][1];
+                            float newPosZ = curvePoints[2][2] * 10f;
+
+                            newPos = new float[]{newPosX, newPosY, newPosZ};
+                        }
+
+                        lastPos = player.getPosition();
+
+                        //System.out.println(Arrays.toString(currentPos) + Arrays.toString(focusPos) + Arrays.toString(newPos));
+                        if(focusPos != currentPos) {
+                        }
+
                     }
                 },
                 100
         );
 
-        pmvMatrix.gluLookAt(player.getPosition()[0], player.getPosition()[1], player.getPosition()[2],
-                player.getPosition()[0]+1, player.getPosition()[1], player.getPosition()[2],
+        // Setting the camera position, based on user input
+        pmvMatrix.gluLookAt(player.getPositionX(), player.getPositionY(), player.getPositionZ(),
+                player.getFocusX(), player.getFocusY(), player.getFocusZ(),
                 0f, 1f, 0f);
         pmvMatrix.glRotatef(interactionHandler.getAngleXaxis(), 1f, 0f, 0f);
         pmvMatrix.glRotatef(interactionHandler.getAngleYaxis(), 0f, 1f, 0f);
 
 
-        // Setting the camera position, based on user input
-        //pmvMatrix.gluLookAt(0f, 0f, 400f,
-        //        0f, 0f, 0f,
-        //        0f, 1.0f, 0f);
-        //pmvMatrix.glTranslatef(interactionHandler.getxPosition(), interactionHandler.getyPosition(), 0f);
-        //pmvMatrix.glRotatef(interactionHandler.getAngleXaxis(), 1f, 0f, 0f);
-        //pmvMatrix.glRotatef(interactionHandler.getAngleYaxis(), 0f, 1f, 0f);
 
+    //   pmvMatrix.gluLookAt(0f, 0f, 600f,
+    //           0f, 0f, 0f,
+    //           0f, 1.0f, 0f);
+    //   pmvMatrix.glTranslatef(interactionHandler.getxPosition(), interactionHandler.getyPosition(), 0f);
+    //   pmvMatrix.glRotatef(interactionHandler.getAngleXaxis(), 1f, 0f, 0f);
+    //   pmvMatrix.glRotatef(interactionHandler.getAngleYaxis(), 0f, 1f, 0f);
 
         //Place all walls
         for(int i = 0; i < noOfWalls; i++) {
@@ -659,6 +731,7 @@ public class Larbrynth extends GLCanvas implements GLEventListener {
 
         // Use the vertices in the VBO to draw a triangle.
         gl.glDrawArrays(GL.GL_TRIANGLES, 0, skullVertices.length);
+        drawCurve(gl2, curvePoints);
         //gl.glDrawArrays(GL.GL_TRIANGLES, 0, boneVertices.length);
     }
 
