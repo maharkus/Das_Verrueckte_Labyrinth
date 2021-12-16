@@ -13,7 +13,7 @@ public class Rectangle extends JPanel{
         Graphics2D g2d = (Graphics2D) g;
 
         g2d.setColor(new Color(255, 0 , 0));
-        g2d.drawRect(10, 0, 200, 150);
+        g2d.drawRect(0, 0, 200, 150);
     }
 
     @Override

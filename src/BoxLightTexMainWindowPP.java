@@ -110,7 +110,6 @@ public class BoxLightTexMainWindowPP extends JFrame {
         //Create all panels
         JPanel canvasPanel = new JPanel();
         JPanel cameraPanel = new JPanel();
-        JPanel rectanglePanel = new JPanel();
 
 
         // add Canvas to CanvasPanel
@@ -123,11 +122,8 @@ public class BoxLightTexMainWindowPP extends JFrame {
         cameraPanel.setLocation(1280,0);
         createCameraView(cameraPanel);
 
-        // create rectangle and add to rectanglePanel
-        rectanglePanel.setVisible(true);
 
         // Add Content to window
-        this.getContentPane().add(rectanglePanel);
         this.getContentPane().add(cameraPanel);
         this.getContentPane().add(canvasPanel);
 
@@ -169,8 +165,8 @@ public class BoxLightTexMainWindowPP extends JFrame {
 
         if(Webcam.getDefault()!=null) {
             Camera webcam = new Camera(Webcam.getDefault());
-            cameraPanel.add(webcam.getPanel());
             cameraPanel.add(Camera.drawRectangle());
+            cameraPanel.add(webcam.getPanel());
 
             System.out.println("webcamsize: " + webcam.getPanel().getSize());
         }

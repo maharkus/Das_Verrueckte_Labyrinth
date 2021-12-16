@@ -32,6 +32,7 @@ public class Camera extends JPanel{
 
     public static Rectangle drawRectangle(){
         Rectangle rect = new Rectangle();
+        rect.setOpaque(false);
         return rect;
     }
 
