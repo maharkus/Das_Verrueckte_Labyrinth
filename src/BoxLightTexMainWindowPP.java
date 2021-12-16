@@ -28,27 +28,18 @@
 
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.*;
 
 import com.github.sarxos.webcam.Webcam;
-import com.github.sarxos.webcam.WebcamResolution;
 import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.util.FPSAnimator;
 
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.PropertyResourceBundle;
-import java.util.ResourceBundle;
-
-
 
 /**
  * Container class of the graphics application.
@@ -70,13 +61,13 @@ import java.util.ResourceBundle;
 public class BoxLightTexMainWindowPP extends JFrame {
 
     private static final long serialVersionUID = 1L;
-    private static String FRAME_TITLE = "Das Verrückte Labyrinth";
+    private static String FRAME_TITLE = "Start Code Main Window - Fixed Function Pipeline with Menu";
 
     private static final int WINDOW_WIDTH = 1920;
     private static final int WINDOW_HEIGHT = 1080;
 
-    private static final int GlCANVAS_WIDTH = 640;  // width of the canvas
-    private static final int GlCANVAS_HEIGHT = 480; // height of the canvas
+    private static final int GLCANVAS_WIDTH = 640;  // width of the canvas
+    private static final int GLCANVAS_HEIGHT = 480; // height of the canvas
     private static final int FRAME_RATE = 60; // target frames per seconds
 
     public static JButton button = null;
@@ -93,7 +84,7 @@ public class BoxLightTexMainWindowPP extends JFrame {
         GLCapabilities capabilities = new GLCapabilities(profile);
 
         // Create the OpenGL Canvas for rendering content
-        GLCanvas canvas = new BoxLightTexRendererPP(capabilities);
+        GLCanvas canvas = new Larbrynth(capabilities);
         //canvas.setPreferredSize(new Dimension(GLCANVAS_WIDTH, GLCANVAS_HEIGHT));
         //canvas.setSize(new Dimension(GLCANVAS_WIDTH, GLCANVAS_HEIGHT));
 
@@ -104,33 +95,24 @@ public class BoxLightTexMainWindowPP extends JFrame {
         // Create the window container
         this.setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
 
-        // Close window
-        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        // Create and add split pane to window
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+        splitPane.setDividerLocation(500);
+        splitPane.setEnabled(false);
 
-        //Create all panels
-        JPanel canvasPanel = new JPanel();
-        JPanel cameraPanel = new JPanel();
+        // Create and add menu panel to left side of split pane
+        JPanel menuPanel = new JPanel();
+        splitPane.setLeftComponent(menuPanel);
 
+        // Create and add glpanel to right side of split pane
+        JPanel glPanel = new JPanel();
+        splitPane.setRightComponent(glPanel);
+        glPanel.add(canvas);
 
-        // add Canvas to CanvasPanel
-        canvasPanel.add(canvas);
-        canvasPanel.setSize(1920,1080);
+        createCameraView(menuPanel);
 
-
-        // setSize of CameraPanel to Size of Camera resolution, set Location to right top and create Camera + add to cameraPanel
-        cameraPanel.setSize(640,480);
-        cameraPanel.setLocation(1280,0);
-        createCameraView(cameraPanel);
-
-
-        // Add Content to window
-        this.getContentPane().add(cameraPanel);
-        this.getContentPane().add(canvasPanel);
-
-        // repaint ContentPane
-        //this.getContentPane().revalidate();
-
-        // Make Frame 
+        // Add split pane to window
+        this.getContentPane().add(splitPane);
 
         this.addWindowListener(new WindowAdapter() {
             @Override
@@ -146,42 +128,37 @@ public class BoxLightTexMainWindowPP extends JFrame {
                 }.start();
             }
         });
-        this.setResizable(false);
+        this.setResizable(true);
         this.setTitle(FRAME_TITLE);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.pack();
         this.setVisible(true);
         animator.start();
 
-        // Set canvas size to size of rectanglePanel
-        canvas.setSize(1920,1080);
-        canvas.setVisible(true);
+        // Set canvas size to size of glpanel
+        canvas.setSize(glPanel.getSize());
 
         // OpenGL: request focus for canvas
-        //canvas.requestFocusInWindow();
+        canvas.requestFocusInWindow();
     }
 
-    public void createCameraView(JPanel cameraPanel) {
+    public void createCameraView(JPanel menuPanel) {
 
         if(Webcam.getDefault()!=null) {
             Camera webcam = new Camera(Webcam.getDefault());
-            cameraPanel.add(Camera.drawRectangle());
-            cameraPanel.add(webcam.getPanel());
-
-            System.out.println("webcamsize: " + webcam.getPanel().getSize());
+            menuPanel.add(webcam.getPanel());
         }
         else {
-           cameraPanel.setLayout(new GridLayout(3,1));
+           menuPanel.setLayout(new GridLayout(3,1));
            noCameraText = new JLabel("Es wurde keine Kamera erkannt!");
            noCameraText.setHorizontalAlignment(SwingConstants.CENTER);
            button = new JButton("Erneut versuchen");
            button.addActionListener(e -> {
                System.out.println("Attempt to find camera again");
-               createCameraView(cameraPanel);
+               createCameraView(menuPanel);
            });
-           cameraPanel.add(noCameraText);
-           cameraPanel.add(Camera.drawRectangle());
-           cameraPanel.add(button);
+           menuPanel.add(noCameraText);
+           menuPanel.add(button);
         }
     }
 
@@ -189,7 +166,6 @@ public class BoxLightTexMainWindowPP extends JFrame {
      * Creates the main window and starts the program
      * @param args The arguments are not used
      */
-
     public static void main(String[] args) throws IOException {
         // Ensure thread safety
         SwingUtilities.invokeLater(new Runnable() {
