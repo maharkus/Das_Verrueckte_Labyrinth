@@ -34,6 +34,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.awt.GLCanvas;
@@ -70,7 +72,7 @@ import static java.lang.Math.sin;
  * @author Karsten Lehn
  * @version 12.11.2017, 18.9.2019
  */
-public class Larbrynth extends GLCanvas implements GLEventListener {
+public class Labyrinth extends GLCanvas implements GLEventListener {
 
     private static final long serialVersionUID = 1L;
 
@@ -129,7 +131,7 @@ public class Larbrynth extends GLCanvas implements GLEventListener {
     /**
      * Standard constructor for object creation.
      */
-    public Larbrynth() {
+    public Labyrinth() {
         // Create the canvas with default capabilities
         super();
         // Add this object as OpenGL event listener
@@ -142,7 +144,7 @@ public class Larbrynth extends GLCanvas implements GLEventListener {
      *
      * @param capabilities The capabilities of the canvas, including the OpenGL profile
      */
-    public Larbrynth(GLCapabilities capabilities) {
+    public Labyrinth(GLCapabilities capabilities) {
         // Create the canvas with the requested OpenGL capabilities
         super(capabilities);
         // Add this object as an OpenGL event listener
@@ -626,7 +628,6 @@ public class Larbrynth extends GLCanvas implements GLEventListener {
         gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
         // Using the PMV-Tool for geometric transforms
-
         pmvMatrix.glMatrixMode(PMVMatrix.GL_MODELVIEW);
         pmvMatrix.glLoadIdentity();
 
@@ -636,9 +637,7 @@ public class Larbrynth extends GLCanvas implements GLEventListener {
                     @Override
                     public void run() {
 
-
-                        move();
-
+                        move(newPos);
                         lastPos = player.getPosition();
                     }
                 },
@@ -693,19 +692,13 @@ public class Larbrynth extends GLCanvas implements GLEventListener {
         //gl.glDrawArrays(GL.GL_TRIANGLES, 0, boneVertices.length);
     }
 
-    public void move() {
+    public void move(float[] newPos) {
+
         if (newPos[2] != player.getPositionZ()) {
             player.setPositionZ(player.getPositionZ() - 1);
         }
         else if (newPos[0] != player.getPositionX()) {
             player.setPositionX(player.getPositionX() + 1);
-        }
-        else if (!Arrays.toString(player.getFocus()).equals(Arrays.toString(nextFocus))) {
-            if (!focusSet) {
-                nextFocus = changeFocusPoint(player.getPosition(), player.getFocus(), -90);
-                focusSet = true;
-            }
-            player.setFocus(transitionBetweenPoints(player.getFocus(), nextFocus));
         }
     }
 
@@ -720,6 +713,26 @@ public class Larbrynth extends GLCanvas implements GLEventListener {
 
     }
 
+    public void rotate(float deg) {
+        if (!Arrays.toString(player.getFocus()).equals(Arrays.toString(nextFocus))) {
+            if (!focusSet) {
+                nextFocus = changeFocusPoint(player.getPosition(), player.getFocus(), deg);
+                focusSet = true;
+            }
+            Timer t = new Timer();
+            t.schedule(new TimerTask() {
+                @Override
+                public void run(){
+                    player.setFocus(transitionBetweenPoints(player.getFocus(), nextFocus));
+                    System.out.println(Arrays.toString(player.getFocus()) + Arrays.toString(nextFocus));
+                    if (Arrays.equals(player.getFocus(), nextFocus)) {
+                        focusSet = false;
+                    }
+                }
+            },0,10);
+        }
+    }
+
     private float[] changeFocusPoint(float[] pos, float[] focus, float rotation) {
 
         //Help vector in 0/0/0
@@ -729,39 +742,28 @@ public class Larbrynth extends GLCanvas implements GLEventListener {
         }
 
         //Convert degree to radiant
-        rotation = (float) (rotation * (Math.PI / 180));
+        rotation = (float) Math.toRadians(rotation);
 
         //Rotation applied via matrix
-        vector[0] = (float) (cos(rotation) * vector[0] + sin(rotation) * vector[2] + pos[0]);
-        vector[1] = 1f;
-        vector[2] = (float) (-sin(rotation) * vector[0] + cos(rotation) * vector[2] + pos[2]);
+        focus[0] = (float) (cos(rotation) * vector[0] + sin(rotation) * vector[2] + pos[0]);
+        focus[2] = (float) (-sin(rotation) * vector[0] + cos(rotation) * vector[2] + pos[2]);
 
         //Return new focus point
-        return vector;
+        return focus;
     }
 
     private float[] transitionBetweenPoints(float[] pos1, float[] pos2) {
 
-        // transition x value
-        if (pos1[0] < pos2[0]) {
-            pos1[0]++;
-        } else if (pos1[0] > pos2[0]) {
-            pos1[0]--;
-        }
-        if (pos1[0] + 1 >= pos2[0] || pos1[0] >= pos2[0] - 1) {
-            pos1[0] = pos2[0];
-        }
-
-        // keep y value
-
-        // transition z value
-        if (pos1[2] < pos2[2]) {
-            pos1[2]++;
-        } else if (pos1[2] > pos2[2]) {
-            pos1[2]--;
-        }
-        if (pos1[2] + 1 >= pos2[2] || pos1[2] >= pos2[2] - 1) {
-            pos1[2] = pos2[2];
+        // transition x and z value, keep y
+        for(int i = 0; i<2; i++) {
+            int j = i*2;
+            if (pos1[j] < pos2[j]) {
+                pos1[j]++;
+            } else if (pos1[j] - 1 > pos2[j]) {
+                pos1[j]--;
+            } else {
+                pos1[j] = pos2[j];
+            }
         }
 
         return pos1;

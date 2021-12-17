@@ -40,7 +40,6 @@ import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.util.FPSAnimator;
 
 import java.io.IOException;
-
 /**
  * Container class of the graphics application.
  * Creates a Window (JFrame) where the OpenGL canvas is displayed in.
@@ -72,6 +71,7 @@ public class BoxLightTexMainWindowPP extends JFrame {
 
     public static JButton button = null;
     public static JLabel noCameraText = null;
+    Labyrinth canvas;
 
     /**
      * Standard constructor generating a Java Swing window for displaying an OpenGL canvas.
@@ -84,7 +84,7 @@ public class BoxLightTexMainWindowPP extends JFrame {
         GLCapabilities capabilities = new GLCapabilities(profile);
 
         // Create the OpenGL Canvas for rendering content
-        GLCanvas canvas = new Larbrynth(capabilities);
+        canvas = new Labyrinth(capabilities);
         //canvas.setPreferredSize(new Dimension(GLCANVAS_WIDTH, GLCANVAS_HEIGHT));
         //canvas.setSize(new Dimension(GLCANVAS_WIDTH, GLCANVAS_HEIGHT));
 
@@ -103,6 +103,26 @@ public class BoxLightTexMainWindowPP extends JFrame {
         // Create and add menu panel to left side of split pane
         JPanel menuPanel = new JPanel();
         splitPane.setLeftComponent(menuPanel);
+        GridLayout menuGrid = new GridLayout(2,1);
+        menuPanel.setLayout(menuGrid);
+
+
+        JButton btnLeft = new JButton("Links");
+        btnLeft.addActionListener(e -> {
+            canvas.rotate(90f);
+        });
+        btnLeft.setSize(200, 100);
+        btnLeft.setLocation(0,0);
+
+
+        JButton btnRight = new JButton("Rechts");
+        btnRight.addActionListener(e -> {
+            canvas.rotate(-90f);
+        });
+        btnRight.setSize(200, 100);
+        btnRight.setLocation(200,0);
+        menuPanel.add(btnRight);
+        menuPanel.add(btnLeft);
 
         // Create and add glpanel to right side of split pane
         JPanel glPanel = new JPanel();
@@ -157,8 +177,9 @@ public class BoxLightTexMainWindowPP extends JFrame {
                System.out.println("Attempt to find camera again");
                createCameraView(menuPanel);
            });
+
+
            menuPanel.add(noCameraText);
-           menuPanel.add(button);
         }
     }
 
