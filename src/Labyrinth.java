@@ -111,7 +111,6 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
 
 
     Player player;
-    float[] lastPos;
     float[] nextFocus = new float[3];
     boolean focusSet = false;
 
@@ -119,7 +118,6 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
     private int noOfWalls;
     private float[] wallPos;
     float[][] curvePoints;
-    float[] newPos;
 
     final Path skullObj = Paths.get("./resources/models/Skull.obj");
     final Path boneObj = Paths.get("./resources/models/Bone.obj");
@@ -192,7 +190,6 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
 
         //Create Player
         player = new Player(new float[]{-155f, 0.5f, 240f}, new float[]{-155f, 1f, 0f});
-        lastPos = player.getPosition();
         nextFocus = changeFocusPoint(player.getPosition(), player.getFocus(), 1 / 2f);
 
 
@@ -262,7 +259,6 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
                 {16.5f, 0.5f, 18f}
         };
 
-        newPos = setNewPosition(curvePoints[0]);
 
         // BEGIN: Allocating vertex array objects and buffers for each object
         noOfWalls = wallSizes.length / 3;
@@ -631,19 +627,6 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         pmvMatrix.glMatrixMode(PMVMatrix.GL_MODELVIEW);
         pmvMatrix.glLoadIdentity();
 
-
-        new java.util.Timer().schedule(
-                new java.util.TimerTask() {
-                    @Override
-                    public void run() {
-
-                        move(newPos);
-                        lastPos = player.getPosition();
-                    }
-                },
-                100
-        );
-
         // Setting the camera position, based on user input
         pmvMatrix.gluLookAt(player.getPositionX(), player.getPositionY(), player.getPositionZ(),
                 player.getFocusX(), player.getFocusY(), player.getFocusZ(),
@@ -692,45 +675,37 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         //gl.glDrawArrays(GL.GL_TRIANGLES, 0, boneVertices.length);
     }
 
-    public void move(float[] newPos) {
-
-        if (newPos[2] != player.getPositionZ()) {
-            player.setPositionZ(player.getPositionZ() - 1);
-        }
-        else if (newPos[0] != player.getPositionX()) {
-            player.setPositionX(player.getPositionX() + 1);
-        }
-    }
-
-    public float[] setNewPosition(float[] curvePoint) {
-
-        //Convert curvePoints to proper scale
-        float newPosX = curvePoint[0] * 10f;
-        float newPosY = curvePoint[1];
-        float newPosZ = curvePoint[2] * 10f;
-
-        return new float[]{newPosX, newPosY, newPosZ};
-
+    public void move(int curveIndex) {
+        Timer t = new Timer();
+        t.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                player.setPosition(transitionBetweenPoints(player.getPosition(), curvePoints[curveIndex]));
+                if (Arrays.equals(player.getPosition(), curvePoints[curveIndex])) {
+                    t.purge();
+                    t.cancel();
+                }
+            }
+        }, 0, 10);
     }
 
     public void rotate(float deg) {
-        if (!Arrays.toString(player.getFocus()).equals(Arrays.toString(nextFocus))) {
-            if (!focusSet) {
-                nextFocus = changeFocusPoint(player.getPosition(), player.getFocus(), deg);
-                focusSet = true;
-            }
-            Timer t = new Timer();
-            t.schedule(new TimerTask() {
-                @Override
-                public void run(){
-                    player.setFocus(transitionBetweenPoints(player.getFocus(), nextFocus));
-                    System.out.println(Arrays.toString(player.getFocus()) + Arrays.toString(nextFocus));
-                    if (Arrays.equals(player.getFocus(), nextFocus)) {
-                        focusSet = false;
-                    }
-                }
-            },0,10);
+        if (!focusSet) {
+            nextFocus = changeFocusPoint(player.getPosition(), player.getFocus(), deg);
+            focusSet = true;
         }
+        Timer t = new Timer();
+        t.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                player.setFocus(transitionBetweenPoints(player.getFocus(), nextFocus));
+                if (Arrays.equals(player.getFocus(), nextFocus)) {
+                    focusSet = false;
+                    t.purge();
+                    t.cancel();
+                }
+            }
+        }, 0, 10);
     }
 
     private float[] changeFocusPoint(float[] pos, float[] focus, float rotation) {
@@ -755,8 +730,8 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
     private float[] transitionBetweenPoints(float[] pos1, float[] pos2) {
 
         // transition x and z value, keep y
-        for(int i = 0; i<2; i++) {
-            int j = i*2;
+        for (int i = 0; i < 2; i++) {
+            int j = i * 2;
             if (pos1[j] < pos2[j]) {
                 pos1[j]++;
             } else if (pos1[j] - 1 > pos2[j]) {

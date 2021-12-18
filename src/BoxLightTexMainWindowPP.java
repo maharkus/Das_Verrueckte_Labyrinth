@@ -103,26 +103,32 @@ public class BoxLightTexMainWindowPP extends JFrame {
         // Create and add menu panel to left side of split pane
         JPanel menuPanel = new JPanel();
         splitPane.setLeftComponent(menuPanel);
-        GridLayout menuGrid = new GridLayout(2,1);
+        GridLayout menuGrid = new GridLayout(3,2);
         menuPanel.setLayout(menuGrid);
 
+
+        JButton btnForward = new JButton("Vorwärts");
+        int pos = 0;
+        btnForward.addActionListener(e -> {
+            canvas.move(pos);
+        });
+        btnForward.setSize(100, 50);
+        menuPanel.add(btnForward);
 
         JButton btnLeft = new JButton("Links");
         btnLeft.addActionListener(e -> {
             canvas.rotate(90f);
         });
-        btnLeft.setSize(200, 100);
-        btnLeft.setLocation(0,0);
+        btnLeft.setSize(100, 50);
+        menuPanel.add(btnLeft);
 
 
         JButton btnRight = new JButton("Rechts");
         btnRight.addActionListener(e -> {
             canvas.rotate(-90f);
         });
-        btnRight.setSize(200, 100);
-        btnRight.setLocation(200,0);
+        btnRight.setSize(100, 50);
         menuPanel.add(btnRight);
-        menuPanel.add(btnLeft);
 
         // Create and add glpanel to right side of split pane
         JPanel glPanel = new JPanel();
