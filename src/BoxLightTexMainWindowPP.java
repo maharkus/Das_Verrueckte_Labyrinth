@@ -36,10 +36,11 @@ import javax.swing.*;
 import com.github.sarxos.webcam.Webcam;
 import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLProfile;
-import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.util.FPSAnimator;
 
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * Container class of the graphics application.
  * Creates a Window (JFrame) where the OpenGL canvas is displayed in.
@@ -108,9 +109,10 @@ public class BoxLightTexMainWindowPP extends JFrame {
 
 
         JButton btnForward = new JButton("Vorwärts");
-        int pos = 0;
+        AtomicInteger pos = new AtomicInteger();
         btnForward.addActionListener(e -> {
-            canvas.move(pos);
+            canvas.move(pos.get());
+            pos.getAndIncrement();
         });
         btnForward.setSize(100, 50);
         menuPanel.add(btnForward);

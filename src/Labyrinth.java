@@ -676,12 +676,18 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
     }
 
     public void move(int curveIndex) {
+        float[] newPos = new float[3];
+        newPos[0] = curvePoints[curveIndex][0]*10;
+        newPos[1] = curvePoints[curveIndex][1];
+        newPos[2] = curvePoints[curveIndex][2]*10;
+
         Timer t = new Timer();
         t.schedule(new TimerTask() {
             @Override
             public void run() {
-                player.setPosition(transitionBetweenPoints(player.getPosition(), curvePoints[curveIndex]));
-                if (Arrays.equals(player.getPosition(), curvePoints[curveIndex])) {
+                player.setPosition(transitionBetweenPoints(player.getPosition(), newPos));
+                System.out.println(Arrays.toString(player.getPosition()));
+                if (Arrays.equals(player.getPosition(), newPos)) {
                     t.purge();
                     t.cancel();
                 }
