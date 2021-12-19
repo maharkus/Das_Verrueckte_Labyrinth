@@ -32,10 +32,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.awt.GLCanvas;
@@ -86,9 +83,7 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
 
     // taking texture files from relative path
     private final String texturePath = ".\\resources\\";
-    //    final String textureFileName = "GelbGruenPalette.png";
     final String textureFileName = "wall3.jpg";
-    final String floorTextureName = "dwayne_rock.jpg";
 
     private ShaderProgram shaderProgram0;
     private ShaderProgram shaderProgram;
@@ -117,7 +112,7 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
     private int noOfObjects;
     private int noOfWalls;
     private float[] wallPos;
-    float[][] curvePoints;
+    ArrayList<StopPoint> curvePoints = new ArrayList<>();
 
     final Path skullObj = Paths.get("./resources/models/Skull.obj");
     final Path boneObj = Paths.get("./resources/models/Bone.obj");
@@ -189,7 +184,7 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
 
 
         //Create Player
-        player = new Player(new float[]{-155f, 0.5f, 240f}, new float[]{-155f, 1f, 0f});
+        player = new Player(new float[]{-155f, 0.3f, 240f}, new float[]{-155f, 0.3f, 0f});
         nextFocus = changeFocusPoint(player.getPosition(), player.getFocus(), 1 / 2f);
 
 
@@ -244,20 +239,55 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
                 200, 0, 0,
         };
 
-        curvePoints = new float[][]{
-                {-15.5f, 0.5f, 18f},
-                {-6f, 0.5f, 18f},
-                {-3f, 0.5f, 18f},
-                {1.5f, 0.5f, 18f},
-                {1.5f, 0.5f, 13f},
-                {-3f, 0.5f, 8f},
-                {6.5f, 0.5f, 8f},
-                {6.5f, 0.5f, 18f},
-                {11f, 0.5f, 18f},
-                {11f, 0.5f, 8f},
-                {16.5f, 0.5f, 8f},
-                {16.5f, 0.5f, 18f}
+        float[][] positions = new float[][]{
+                {-15.5f, 0.3f, 18f},
+                {-3f, 0.3f, 18f},
+               /* {1.5f, 0.3f, 18f},
+                {1.5f, 0.3f, 13f},
+                {-3f, 0.3f, 8f},
+                {6.5f, 0.3f, 8f},
+                {6.5f, 0.3f, 18f},
+                {11f, 0.3f, 18f},
+                {11f, 0.3f, 8f},
+                {16.5f, 0.3f, 8f},
+                {16.5f, 0.3f, 18f},
+                {16.5f, 0.3f, -7f},
+                {11.5f, 0.3f, -7f},
+                {11.5f, 0.3f, 2f},
+                {4.5f, 0.3f, -7f},
+                {4.5f, 0.3f, -1f},
+                {4.5f, 0.3f, 2f},
+                {-3.5f, 0.3f, 2f},
+                {-3.5f, 0.3f, -1f},
+                {-9f, 0.3f, -1f},
+                {16.5f, 0.3f, -12f},
+                {-3.5f, 0.3f, -12f},
+                {-3.5f, 0.3f, -18f},
+                {-15.5f, 0.3f, -18f},
+                {15f, 0.3f, -18f}*/
         };
+
+        int[][] directions = new int[][] {
+                {1, 0, 0, 0},
+                {2, 3, 0, 1}
+                /*          {null, 90, 180},
+                          {270},
+                          {0, 270},
+                          {180, 270},
+                          {0, 90},
+                          {90, 180},
+                          {0, 270},
+                          {180, 270},
+                          {90},
+                          {0, 270},
+                          {0, 270},
+                          {0, 270},*/
+
+        };
+
+        for (int i = 0; i<positions.length; i++) {
+            curvePoints.add(i, new StopPoint(positions[i], directions[i]));
+        }
 
 
         // BEGIN: Allocating vertex array objects and buffers for each object
@@ -593,15 +623,15 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         material0 = new Material(matEmission, matAmbient, matDiffuse, matSpecular, matShininess);
     }
 
-    public void drawCurve(GL2 gl, float[][] curvePoints) {
+    public void drawCurve(GL2 gl, ArrayList<StopPoint> curvePoints) {
 
         gl.glEnable(GL_MAP1_VERTEX_3);
 
         gl.glPointSize(20f);
         gl.glColor3f(1f, 1f, 1f);
         gl.glBegin(GL_POINTS);
-        for (float[] curvePoint : curvePoints) {
-            gl.glVertex3f(curvePoint[0], curvePoint[1], curvePoint[2]);
+        for (StopPoint curvePoint : curvePoints) {
+            gl.glVertex3f(curvePoint.getPos()[0], curvePoint.getPos()[1], curvePoint.getPos()[2]);
         }
 
         gl.glEnd();
@@ -634,13 +664,13 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         pmvMatrix.glRotatef(interactionHandler.getAngleXaxis(), 1f, 0f, 0f);
         pmvMatrix.glRotatef(interactionHandler.getAngleYaxis(), 0f, 1f, 0f);
 
-
-        //   pmvMatrix.gluLookAt(0f, 0f, 600f,
-        //           0f, 0f, 0f,
-        //           0f, 1.0f, 0f);
-        //   pmvMatrix.glTranslatef(interactionHandler.getxPosition(), interactionHandler.getyPosition(), 0f);
-        //   pmvMatrix.glRotatef(interactionHandler.getAngleXaxis(), 1f, 0f, 0f);
-        //   pmvMatrix.glRotatef(interactionHandler.getAngleYaxis(), 0f, 1f, 0f);
+/*
+           pmvMatrix.gluLookAt(0f, 0f, 600f,
+                   0f, 0f, 0f,
+                   0f, 1.0f, 0f);
+           pmvMatrix.glTranslatef(interactionHandler.getxPosition(), interactionHandler.getyPosition(), 0f);
+           pmvMatrix.glRotatef(interactionHandler.getAngleXaxis(), 1f, 0f, 0f);
+           pmvMatrix.glRotatef(interactionHandler.getAngleYaxis(), 0f, 1f, 0f);*/
 
         //Place all walls
         for (int i = 0; i < noOfWalls; i++) {
@@ -677,19 +707,25 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
 
     public void move(int curveIndex) {
         float[] newPos = new float[3];
-        newPos[0] = curvePoints[curveIndex][0]*10;
-        newPos[1] = curvePoints[curveIndex][1];
-        newPos[2] = curvePoints[curveIndex][2]*10;
+        newPos[0] = curvePoints.get(curveIndex).getPos()[0]*10;
+        newPos[1] = curvePoints.get(curveIndex).getPos()[1];
+        newPos[2] = curvePoints.get(curveIndex).getPos()[2]*10;
+        float[] newFocus = new float[3];
+        newFocus[0] = player.getFocusX() + curvePoints.get(curveIndex).getPos()[0]*10 - player.getPositionX();
+        newFocus[1] = player.getFocusY() + curvePoints.get(curveIndex).getPos()[1] - player.getPositionY();
+        newFocus[2] = player.getFocusZ() + curvePoints.get(curveIndex).getPos()[2]*10 - player.getPositionZ();
 
         Timer t = new Timer();
         t.schedule(new TimerTask() {
             @Override
             public void run() {
                 player.setPosition(transitionBetweenPoints(player.getPosition(), newPos));
-                System.out.println(Arrays.toString(player.getPosition()));
+                player.setPosition(transitionBetweenPoints(player.getFocus(), newFocus));
                 if (Arrays.equals(player.getPosition(), newPos)) {
+                    System.out.println("Ich habs geschafft!");
                     t.purge();
                     t.cancel();
+                    player.setPositionIndex(curveIndex);
                 }
             }
         }, 0, 10);
@@ -697,6 +733,7 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
 
     public void rotate(float deg) {
         if (!focusSet) {
+            System.out.println("focus has been reset");
             nextFocus = changeFocusPoint(player.getPosition(), player.getFocus(), deg);
             focusSet = true;
         }
@@ -709,12 +746,17 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
                     focusSet = false;
                     t.purge();
                     t.cancel();
+                    player.setAngle(player.getAngle() + deg);
+                    if(player.getAngle() < 0) {
+                        player.setAngle(270);
+                    }
+                    System.out.println(player.getAngle());
                 }
             }
         }, 0, 10);
     }
 
-    private float[] changeFocusPoint(float[] pos, float[] focus, float rotation) {
+    private float[] changeFocusPoint(float[] pos, float[] focus, float deg) {
 
         //Help vector in 0/0/0
         float[] vector = new float[3];
@@ -723,11 +765,11 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         }
 
         //Convert degree to radiant
-        rotation = (float) Math.toRadians(rotation);
+        deg = (float) Math.toRadians(deg);
 
         //Rotation applied via matrix
-        focus[0] = (float) (cos(rotation) * vector[0] + sin(rotation) * vector[2] + pos[0]);
-        focus[2] = (float) (-sin(rotation) * vector[0] + cos(rotation) * vector[2] + pos[2]);
+        focus[0] = (float) (cos(deg) * vector[0] + sin(deg) * vector[2] + pos[0]);
+        focus[2] = (float) (-sin(deg) * vector[0] + cos(deg) * vector[2] + pos[2]);
 
         //Return new focus point
         return focus;

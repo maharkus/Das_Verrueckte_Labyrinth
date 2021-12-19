@@ -73,6 +73,7 @@ public class BoxLightTexMainWindowPP extends JFrame {
     public static JButton button = null;
     public static JLabel noCameraText = null;
     Labyrinth canvas;
+    Player player;
 
     /**
      * Standard constructor generating a Java Swing window for displaying an OpenGL canvas.
@@ -86,6 +87,7 @@ public class BoxLightTexMainWindowPP extends JFrame {
 
         // Create the OpenGL Canvas for rendering content
         canvas = new Labyrinth(capabilities);
+        player = canvas.player;
         //canvas.setPreferredSize(new Dimension(GLCANVAS_WIDTH, GLCANVAS_HEIGHT));
         //canvas.setSize(new Dimension(GLCANVAS_WIDTH, GLCANVAS_HEIGHT));
 
@@ -109,10 +111,8 @@ public class BoxLightTexMainWindowPP extends JFrame {
 
 
         JButton btnForward = new JButton("Vorwärts");
-        AtomicInteger pos = new AtomicInteger();
         btnForward.addActionListener(e -> {
-            canvas.move(pos.get());
-            pos.getAndIncrement();
+            canvas.move(canvas.curvePoints.get(canvas.player.getPositionIndex()).getDirections()[(int) (canvas.player.getAngle()/90)]);
         });
         btnForward.setSize(100, 50);
         menuPanel.add(btnForward);

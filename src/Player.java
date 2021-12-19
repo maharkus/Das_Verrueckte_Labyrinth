@@ -1,4 +1,6 @@
 public class Player {
+
+    int positionIndex;
     float[]position;
     float positionX;
     float positionY;
@@ -7,15 +9,27 @@ public class Player {
     float focusX;
     float focusY;
     float focusZ;
-
+    float angle;
 
     Player(float[] position, float[] focus) {
+        this.positionIndex = 0;
         this.positionX = position[0];
         this.positionY = position[1];
         this.positionZ = position[2];
         this.focusX = focus[0];
         this.focusY = focus[1];
         this.focusZ = focus[2];
+        this.angle = 90;
+    }
+
+    //Getters and setters
+
+    public int getPositionIndex() {
+        return positionIndex;
+    }
+
+    public void setPositionIndex(int positionIndex) {
+        this.positionIndex = positionIndex;
     }
 
     public void setPosition(float[] position) {
@@ -30,10 +44,9 @@ public class Player {
         this.focusZ = focus[2];
     }
 
-
-
-
-    //Getters and setters
+    public void setAngle(float angle) {
+        this.angle = angle;
+    }
 
     public float[] getPosition() {
         return new float[]{positionX, positionY, positionZ};
@@ -42,6 +55,8 @@ public class Player {
     public float[] getFocus() {
         return new float[]{focusX, focusY, focusZ};
     }
+
+    public float getAngle() { return angle;}
 
     public float getPositionX() {
         return positionX;
