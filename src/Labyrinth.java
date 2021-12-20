@@ -94,6 +94,7 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
     private int noOfObjects;
     private int noOfWalls;
     private float[] wallPos;
+    ArrayList<StopPoint> curvePoints = new ArrayList<>();
 
     private static final Path skullObj = Paths.get("./resources/models/Skull.obj");
     private static final Path skullRotObj = Paths.get("./resources/models/SkullRot.obj");
@@ -651,7 +652,6 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         pmvMatrix.glPopMatrix();
 
 
-        GL2 gl2 = drawable.getGL().getGL2();
 
         gl.glUniform4fv(3, 1, light1.getPosition(), 0);
         gl.glUniform4fv(4, 1, light1.getAmbient(), 0);
@@ -713,8 +713,6 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         // Transfer model-view matrix via layout position 1
         gl.glUniformMatrix4fv(1, 1, false, pmvMatrix.glGetMvMatrixf());
 
-        // Use the vertices in the VBO to draw a triangle.
-        gl.glDrawArrays(GL.GL_TRIANGLES, 0, skullVertices.length);
         drawCurve(gl2, curvePoints);
         //gl.glDrawArrays(GL.GL_TRIANGLES, 0, boneVertices.length);
     }
