@@ -28,7 +28,7 @@ public class MainMenu extends JFrame{
         panel.add(StartButton("START", 50, 200, this));
         panel.add(ExitButton("EXIT", 50, 100));
         this.setTitle("Das Verrückkte Labyrinth");
-        this.setSize(1000, 700);
+        this.setSize(1920, 1080);
         this.setLocationRelativeTo((Component)null);
         this.setDefaultCloseOperation(3);
         this.setVisible(true);

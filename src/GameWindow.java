@@ -106,18 +106,30 @@ public class GameWindow {
         // Create and add menu panel to left side of split pane
         JPanel menuPanel = new JPanel();
         splitPane.setLeftComponent(menuPanel);
-        GridLayout menuGrid = new GridLayout(3,2);
+        GridBagLayout menuGrid = new GridBagLayout();
+        GridBagConstraints c = new GridBagConstraints();
         menuPanel.setLayout(menuGrid);
-
+        menuPanel.setSize(500, splitPane.getHeight());
 
         JButton btnForward = new JButton("Vorwärts");
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.ipady = 40;
+        c.weightx = 3;
+        c.gridwidth = 3;
+        c.gridx = 0;
+        c.gridy = 0;
         btnForward.addActionListener(e -> {
             canvas.move(canvas.curvePoints.get(canvas.player.getPositionIndex()).getDirections()[(int) (canvas.player.getAngle()/90)]);
         });
         btnForward.setSize(100, 50);
-        menuPanel.add(btnForward);
+
+        menuPanel.add(btnForward, c);
 
         JButton btnLeft = new JButton("Links");
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.weightx = 0.5;
+        c.gridx = 1;
+        c.gridy =55;
         btnLeft.addActionListener(e -> {
             canvas.rotate(90f);
         });
@@ -126,6 +138,10 @@ public class GameWindow {
 
 
         JButton btnRight = new JButton("Rechts");
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.weightx = 0.5;
+        c.gridx = 1;
+        c.gridy = 1;
         btnRight.addActionListener(e -> {
             canvas.rotate(-90f);
         });
@@ -154,9 +170,7 @@ public class GameWindow {
             menuPanel.add(webcam.getPanel());
         }
         else {
-           menuPanel.setLayout(new GridLayout(3,1));
-           noCameraText = new JLabel("Es wurde keine Kamera erkannt!");
-           noCameraText.setHorizontalAlignment(SwingConstants.CENTER);
+         noCameraText = new JLabel("Es wurde keine Kamera erkannt!");
            button = new JButton("Erneut versuchen");
            button.addActionListener(e -> {
                System.out.println("Attempt to find camera again");
