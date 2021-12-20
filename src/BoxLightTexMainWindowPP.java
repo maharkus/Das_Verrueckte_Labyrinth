@@ -28,30 +28,18 @@
 
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.*;
 
 import com.github.sarxos.webcam.Webcam;
-import com.github.sarxos.webcam.WebcamResolution;
 import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLProfile;
-import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.util.FPSAnimator;
-import de.hshl.obj.loader.OBJLoader;
 
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.PropertyResourceBundle;
-import java.util.ResourceBundle;
-
-import de.hshl.obj.loader.Resource;
-import de.hshl.obj.loader.objects.Mesh;
-import de.hshl.obj.loader.objects.SurfaceObject;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Container class of the graphics application.
@@ -84,6 +72,8 @@ public class BoxLightTexMainWindowPP extends JFrame {
 
     public static JButton button = null;
     public static JLabel noCameraText = null;
+    Labyrinth canvas;
+    Player player;
 
     /**
      * Standard constructor generating a Java Swing window for displaying an OpenGL canvas.
@@ -96,7 +86,8 @@ public class BoxLightTexMainWindowPP extends JFrame {
         GLCapabilities capabilities = new GLCapabilities(profile);
 
         // Create the OpenGL Canvas for rendering content
-        GLCanvas canvas = new BoxLightTexRendererPP(capabilities);
+        canvas = new Labyrinth(capabilities);
+        player = canvas.player;
         //canvas.setPreferredSize(new Dimension(GLCANVAS_WIDTH, GLCANVAS_HEIGHT));
         //canvas.setSize(new Dimension(GLCANVAS_WIDTH, GLCANVAS_HEIGHT));
 
@@ -115,6 +106,31 @@ public class BoxLightTexMainWindowPP extends JFrame {
         // Create and add menu panel to left side of split pane
         JPanel menuPanel = new JPanel();
         splitPane.setLeftComponent(menuPanel);
+        GridLayout menuGrid = new GridLayout(3,2);
+        menuPanel.setLayout(menuGrid);
+
+
+        JButton btnForward = new JButton("Vorwärts");
+        btnForward.addActionListener(e -> {
+            canvas.move(canvas.curvePoints.get(canvas.player.getPositionIndex()).getDirections()[(int) (canvas.player.getAngle()/90)]);
+        });
+        btnForward.setSize(100, 50);
+        menuPanel.add(btnForward);
+
+        JButton btnLeft = new JButton("Links");
+        btnLeft.addActionListener(e -> {
+            canvas.rotate(90f);
+        });
+        btnLeft.setSize(100, 50);
+        menuPanel.add(btnLeft);
+
+
+        JButton btnRight = new JButton("Rechts");
+        btnRight.addActionListener(e -> {
+            canvas.rotate(-90f);
+        });
+        btnRight.setSize(100, 50);
+        menuPanel.add(btnRight);
 
         // Create and add glpanel to right side of split pane
         JPanel glPanel = new JPanel();
@@ -140,7 +156,7 @@ public class BoxLightTexMainWindowPP extends JFrame {
                 }.start();
             }
         });
-        this.setResizable(false);
+        this.setResizable(true);
         this.setTitle(FRAME_TITLE);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.pack();
@@ -169,8 +185,9 @@ public class BoxLightTexMainWindowPP extends JFrame {
                System.out.println("Attempt to find camera again");
                createCameraView(menuPanel);
            });
+
+
            menuPanel.add(noCameraText);
-           menuPanel.add(button);
         }
     }
 
