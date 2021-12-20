@@ -109,6 +109,10 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
     float[] nextFocus = new float[3];
     boolean focusSet = false;
 
+    enum directions {
+        right, up, left, down, stay
+    }
+
     private int noOfObjects;
     private int noOfWalls;
     private float[] wallPos;
@@ -240,52 +244,117 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         };
 
         float[][] positions = new float[][]{
+                //0
                 {-15.5f, 0.3f, 18f},
+                //1
                 {-3f, 0.3f, 18f},
-               /* {1.5f, 0.3f, 18f},
+                //2
+                {1.5f, 0.3f, 18f},
+                //3
                 {1.5f, 0.3f, 13f},
+                //4
                 {-3f, 0.3f, 8f},
+                //5
                 {6.5f, 0.3f, 8f},
+                //6
                 {6.5f, 0.3f, 18f},
+                //7
                 {11f, 0.3f, 18f},
+                //8
                 {11f, 0.3f, 8f},
+                //9
                 {16.5f, 0.3f, 8f},
+                //10
                 {16.5f, 0.3f, 18f},
+                //11
                 {16.5f, 0.3f, -7f},
-                {11.5f, 0.3f, -7f},
-                {11.5f, 0.3f, 2f},
-                {4.5f, 0.3f, -7f},
-                {4.5f, 0.3f, -1f},
-                {4.5f, 0.3f, 2f},
-                {-3.5f, 0.3f, 2f},
-                {-3.5f, 0.3f, -1f},
-                {-9f, 0.3f, -1f},
+                //12
                 {16.5f, 0.3f, -12f},
+                //13
+                {11.5f, 0.3f, 2f},
+                //14
+                {11.5f, 0.3f, -7f},
+                //15
+                {4.5f, 0.3f, -7f},
+                //16
+                {4.5f, 0.3f, -1f},
+                //17
+                {4.5f, 0.3f, 2f},
+                //18
+                {-3.5f, 0.3f, 2f},
+                //19
+                {-3.5f, 0.3f, -1f},
+                //20
+                {-9f, 0.3f, -1f},
+                //21
                 {-3.5f, 0.3f, -12f},
+                //22
                 {-3.5f, 0.3f, -18f},
+                //23
                 {-15.5f, 0.3f, -18f},
-                {15f, 0.3f, -18f}*/
+                //24
+                {15f, 0.3f, -18f},
+                //25
+                {15f, 0.3f, -22f}
         };
 
-        int[][] directions = new int[][] {
+        int[][] directions = new int[][]{
+                //0
                 {1, 0, 0, 0},
-                {2, 3, 0, 1}
-                /*          {null, 90, 180},
-                          {270},
-                          {0, 270},
-                          {180, 270},
-                          {0, 90},
-                          {90, 180},
-                          {0, 270},
-                          {180, 270},
-                          {90},
-                          {0, 270},
-                          {0, 270},
-                          {0, 270},*/
+                //1
+                {2, 4, 0, 1},
+                //2
+                {2, 3, 1, 2},
+                //3
+                {3, 3, 3, 2},
+                //4
+                {5, 4, 4, 1},
+                //5
+                {5, 5, 4, 6},
+                //6
+                {7, 5, 6, 6},
+                //7
+                {7, 8, 6, 7},
+                //8
+                {9, 8, 8, 7},
+                //9
+                {9, 11, 8, 10},
+                //10
+                {10, 9, 10, 10},
+                //11
+                {11, 12, 13, 9},
+                //12
+                {12, 12, 21, 11},
+                //13
+                {11, 13, 15, 14},
+                //14
+                {14, 13, 14, 14},
+                //15
+                {13, 15, 15, 16},
+                //16
+                {16, 15, 16, 17},
+                //17
+                {17, 16, 18, 17},
+                //18
+                {17, 19, 18, 18},
+                //19
+                {19, 19, 20, 18},
+                //20
+                {19, 20, 20, 20},
+                //21
+                {12, 22, 21, 21},
+                //22
+                {24, 22, 23, 21},
+                //23
+                {22, 23, 23, 23},
+                //24
+                {22, 25, 22, 24},
+                //25
+                {25, 25, 25, 24}
 
         };
 
-        for (int i = 0; i<positions.length; i++) {
+        for (int i = 0; i < positions.length; i++) {
             curvePoints.add(i, new StopPoint(positions[i], directions[i]));
         }
 
@@ -664,13 +733,12 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         pmvMatrix.glRotatef(interactionHandler.getAngleXaxis(), 1f, 0f, 0f);
         pmvMatrix.glRotatef(interactionHandler.getAngleYaxis(), 0f, 1f, 0f);
 
-/*
-           pmvMatrix.gluLookAt(0f, 0f, 600f,
-                   0f, 0f, 0f,
-                   0f, 1.0f, 0f);
-           pmvMatrix.glTranslatef(interactionHandler.getxPosition(), interactionHandler.getyPosition(), 0f);
-           pmvMatrix.glRotatef(interactionHandler.getAngleXaxis(), 1f, 0f, 0f);
-           pmvMatrix.glRotatef(interactionHandler.getAngleYaxis(), 0f, 1f, 0f);*/
+        /*pmvMatrix.gluLookAt(0f, 0f, 600f,
+                0f, 0f, 0f,
+                0f, 1.0f, 0f);
+        pmvMatrix.glTranslatef(interactionHandler.getxPosition(), interactionHandler.getyPosition(), 0f);
+        pmvMatrix.glRotatef(interactionHandler.getAngleXaxis(), 1f, 0f, 0f);
+        pmvMatrix.glRotatef(interactionHandler.getAngleYaxis(), 0f, 1f, 0f);*/
 
         //Place all walls
         for (int i = 0; i < noOfWalls; i++) {
@@ -707,20 +775,16 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
 
     public void move(int curveIndex) {
         float[] newPos = new float[3];
-        newPos[0] = curvePoints.get(curveIndex).getPos()[0]*10;
+        newPos[0] = curvePoints.get(curveIndex).getPos()[0] * 10;
         newPos[1] = curvePoints.get(curveIndex).getPos()[1];
-        newPos[2] = curvePoints.get(curveIndex).getPos()[2]*10;
-        float[] newFocus = new float[3];
-        newFocus[0] = player.getFocusX() + curvePoints.get(curveIndex).getPos()[0]*10 - player.getPositionX();
-        newFocus[1] = player.getFocusY() + curvePoints.get(curveIndex).getPos()[1] - player.getPositionY();
-        newFocus[2] = player.getFocusZ() + curvePoints.get(curveIndex).getPos()[2]*10 - player.getPositionZ();
-
+        newPos[2] = curvePoints.get(curveIndex).getPos()[2] * 10;
         Timer t = new Timer();
         t.schedule(new TimerTask() {
             @Override
             public void run() {
-                player.setPosition(transitionBetweenPoints(player.getPosition(), newPos));
-                player.setPosition(transitionBetweenPoints(player.getFocus(), newFocus));
+                player.setPosition(moveBetweenPoints(player.getPosition(), newPos, player.getPosition()));
+                player.setFocus(moveBetweenPoints(player.getPosition(), newPos, player.getFocus()));
+                System.out.println(Arrays.toString(player.getFocus()));
                 if (Arrays.equals(player.getPosition(), newPos)) {
                     System.out.println("Ich habs geschafft!");
                     t.purge();
@@ -741,16 +805,18 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         t.schedule(new TimerTask() {
             @Override
             public void run() {
-                player.setFocus(transitionBetweenPoints(player.getFocus(), nextFocus));
+                player.setFocus(rotateBetweenPoints(player.getFocus(), nextFocus));
                 if (Arrays.equals(player.getFocus(), nextFocus)) {
                     focusSet = false;
                     t.purge();
                     t.cancel();
                     player.setAngle(player.getAngle() + deg);
-                    if(player.getAngle() < 0) {
+                    if (player.getAngle() < 0) {
                         player.setAngle(270);
+                    } else if (player.getAngle() >= 360) {
+                        player.setAngle(0);
                     }
-                    System.out.println(player.getAngle());
+                    System.out.println("Angle: " + player.getAngle());
                 }
             }
         }, 0, 10);
@@ -775,8 +841,25 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         return focus;
     }
 
-    private float[] transitionBetweenPoints(float[] pos1, float[] pos2) {
+    private float[] moveBetweenPoints(float[] pos1, float[] pos2, float[] applyTo) {
 
+
+        // transition x and z value, keep y
+        for (int i = 0; i < 2; i++) {
+            int j = i * 2;
+            if (pos1[j] < pos2[j]) {
+                applyTo[j]++;
+            } else if (pos1[j] - 1 > pos2[j]) {
+                applyTo[j]--;
+            } else {
+                applyTo[j] = applyTo[j] + pos2[j] - pos1[j];
+            }
+        }
+
+        return applyTo;
+    }
+
+    private float[] rotateBetweenPoints(float[] pos1, float[] pos2) {
         // transition x and z value, keep y
         for (int i = 0; i < 2; i++) {
             int j = i * 2;

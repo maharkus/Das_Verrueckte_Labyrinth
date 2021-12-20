@@ -3,10 +3,6 @@ public class StopPoint {
         return pos;
     }
 
-    public void setPos(float[] pos) {
-        this.pos = pos;
-    }
-
     float[] pos = new float[3];
     int[] directions;
 
@@ -17,6 +13,10 @@ public class StopPoint {
 
     public void setDirections(int[] directions) {
         this.directions = directions;
+    }
+
+    public void setPos(float[] pos) {
+        this.pos = pos;
     }
 
     StopPoint(float[] pos, int[] directions) {
