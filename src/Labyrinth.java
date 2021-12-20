@@ -792,7 +792,7 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
                     player.setPositionIndex(curveIndex);
                 }
             }
-        }, 0, 10);
+        }, 0, 8);
     }
 
     public void rotate(float deg) {
@@ -819,7 +819,7 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
                     System.out.println("Angle: " + player.getAngle());
                 }
             }
-        }, 0, 10);
+        }, 0, 5);
     }
 
     private float[] changeFocusPoint(float[] pos, float[] focus, float deg) {
