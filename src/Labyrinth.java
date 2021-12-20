@@ -217,57 +217,57 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
 
         float[][] positions = new float[][]{
                 //0
-                {-15.5f, 0.3f, 18f},
+                {-155f, 0.3f, 180f},
                 //1
-                {-3f, 0.3f, 18f},
+                {-30f, 0.3f, 180f},
                 //2
-                {1.5f, 0.3f, 18f},
+                {15f, 0.3f, 180f},
                 //3
-                {1.5f, 0.3f, 13f},
+                {15f, 0.3f, 130f},
                 //4
-                {-3f, 0.3f, 8f},
+                {-30f, 0.3f, 80f},
                 //5
-                {6.5f, 0.3f, 8f},
+                {65f, 0.3f, 80f},
                 //6
-                {6.5f, 0.3f, 18f},
+                {65f, 0.3f, 180f},
                 //7
-                {11f, 0.3f, 18f},
+                {110f, 0.3f, 180f},
                 //8
-                {11f, 0.3f, 8f},
+                {110f, 0.3f, 80f},
                 //9
-                {16.5f, 0.3f, 8f},
+                {165f, 0.3f, 80f},
                 //10
-                {16.5f, 0.3f, 18f},
+                {165f, 0.3f, 180f},
                 //11
-                {16.5f, 0.3f, -7f},
+                {165f, 0.3f, -70f},
                 //12
-                {16.5f, 0.3f, -12f},
+                {165f, 0.3f, -120f},
                 //13
-                {11.5f, 0.3f, 2f},
+                {115f, 0.3f, -70f},
                 //14
-                {11.5f, 0.3f, -7f},
+                {115f, 0.3f, 20f},
                 //15
-                {4.5f, 0.3f, -7f},
+                {45f, 0.3f, -70f},
                 //16
-                {4.5f, 0.3f, -1f},
+                {45f, 0.3f, -10f},
                 //17
-                {4.5f, 0.3f, 2f},
+                {45f, 0.3f, 20f},
                 //18
-                {-3.5f, 0.3f, 2f},
+                {-35f, 0.3f, 20f},
                 //19
-                {-3.5f, 0.3f, -1f},
+                {-35f, 0.3f, -10f},
                 //20
-                {-9f, 0.3f, -1f},
+                {-90f, 0.3f, -10f},
                 //21
-                {-3.5f, 0.3f, -12f},
+                {-35f, 0.3f, -120f},
                 //22
-                {-3.5f, 0.3f, -18f},
+                {-35f, 0.3f, -180f},
                 //23
-                {-15.5f, 0.3f, -18f},
+                {-155f, 0.3f, -180f},
                 //24
-                {15f, 0.3f, -18f},
+                {150f, 0.3f, -180f},
                 //25
-                {15f, 0.3f, -22f}
+                {150f, 0.3f, -220f}
         };
 
         int[][] directions = new int[][]{
@@ -737,10 +737,9 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
     }
 
     public void move(int curveIndex) {
-        float[] newPos = new float[3];
-        newPos[0] = curvePoints.get(curveIndex).getPos()[0] * 10;
-        newPos[1] = curvePoints.get(curveIndex).getPos()[1];
-        newPos[2] = curvePoints.get(curveIndex).getPos()[2] * 10;
+
+        float[] newPos = curvePoints.get(curveIndex).getPos();
+
         Timer t = new Timer();
         t.schedule(new TimerTask() {
             @Override
@@ -749,7 +748,6 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
                 player.setFocus(moveBetweenPoints(player.getPosition(), newPos, player.getFocus()));
                 System.out.println(Arrays.toString(player.getFocus()));
                 if (Arrays.equals(player.getPosition(), newPos)) {
-                    System.out.println("Ich habs geschafft!");
                     t.purge();
                     t.cancel();
                     player.setPositionIndex(curveIndex);
@@ -760,7 +758,6 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
 
     public void rotate(float deg) {
         if (!focusSet) {
-            System.out.println("focus has been reset");
             nextFocus = changeFocusPoint(player.getPosition(), player.getFocus(), deg);
             focusSet = true;
         }
@@ -779,7 +776,6 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
                     } else if (player.getAngle() >= 360) {
                         player.setAngle(0);
                     }
-                    System.out.println("Angle: " + player.getAngle());
                 }
             }
         }, 0, 5);
@@ -823,6 +819,7 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
     }
 
     private float[] rotateBetweenPoints(float[] pos1, float[] pos2) {
+
         // transition x and z value, keep y
         for (int i = 0; i < 2; i++) {
             int j = i * 2;
