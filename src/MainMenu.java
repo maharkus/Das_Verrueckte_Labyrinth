@@ -25,7 +25,7 @@ public class MainMenu {
             }
             public void mouseReleased(MouseEvent e) {
                 button.setBackground(new Color(102, 0, 153));
-                new BoxLightTexMainWindowPP();
+                new GameWindow();
             }
         });
         return button;
@@ -44,6 +44,7 @@ public class MainMenu {
         button.setBorderPainted(false);
         button.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
+
                 button.setBackground(new Color(10,10,255));
             }
             public void mouseReleased(MouseEvent e) {
