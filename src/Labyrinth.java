@@ -47,28 +47,7 @@ import static com.jogamp.opengl.GL2.GL_MAP1_VERTEX_3;
 import static com.jogamp.opengl.math.FloatUtil.cos;
 import static java.lang.Math.sin;
 
-/**
- * Performs the OpenGL graphics processing using the Programmable Pipeline and the
- * OpenGL Core profile
- * <p>
- * Starts an animation loop.
- * Zooming and rotation of the Camera is included (see InteractionHandler).
- * Use: left/right/up/down-keys and +/-Keys
- * Draws a simple box with light and textures.
- * Serves as a template (start code) for setting up an OpenGL/Jogl application
- * using a vertex and fragment shader.
- * <p>
- * Please make sure setting the file path and names of the shader correctly (see below).
- * <p>
- * Core code is based on a tutorial by Chua Hock-Chuan
- * http://www3.ntu.edu.sg/home/ehchua/programming/opengl/JOGL2.0.html
- * <p>
- * and on an example by Xerxes Rånby
- * http://jogamp.org/git/?p=jogl-demos.git;a=blob;f=src/demos/es2/RawGL2ES2demo.java;hb=HEAD
- *
- * @author Karsten Lehn
- * @version 12.11.2017, 18.9.2019
- */
+
 public class Labyrinth extends GLCanvas implements GLEventListener {
 
     private static final long serialVersionUID = 1L;
@@ -78,8 +57,6 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
     // Shader for object 0
     private final String vertexShader0FileName = "BlinnPhongPointTex.vert";
     private final String fragmentShader0FileName = "BlinnPhongPointTex.frag";
-    final String vertexShaderFileName = "Basic.vert";
-    final String fragmentShaderFileName = "Basic.frag";
 
     // taking texture files from relative path
     private final String texturePath = ".\\resources\\";
@@ -98,6 +75,7 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
 
     // Define light sources
     private LightSource light0;
+    private LightSource light1;
 
     // Object for handling keyboard and mouse interaction
     private InteractionHandler interactionHandler;
@@ -118,16 +96,20 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
     private float[] wallPos;
     ArrayList<StopPoint> curvePoints = new ArrayList<>();
 
-    final Path skullObj = Paths.get("./resources/models/Skull.obj");
-    final Path boneObj = Paths.get("./resources/models/Bone.obj");
-
-    // contains the geometry of our OBJ file
-    private float[] skullVertices;
+    private static final Path skullObj = Paths.get("./resources/models/Skull.obj");
+    private static final Path skullRotObj = Paths.get("./resources/models/SkullRot.obj");
+    private static final Path torchObj = Paths.get("./resources/models/torch.obj");
+    private static final Path torch180Obj = Paths.get("./resources/models/torch180.obj");
+    private static final Path boneObj = Paths.get("./resources/models/Bone.obj");
+    private static final Path pumpkinObj = Paths.get("./resources/models/pumpkin.obj");
+    private float[] skullRotVertices;
+    private float[] bigSkullVertices;
+    private float[] torchVertices;
+    private float[] torch180Vertices;
     private float[] boneVertices;
+    private float[] pumpkinVertices;
 
-    /**
-     * Standard constructor for object creation.
-     */
+
     public Labyrinth() {
         // Create the canvas with default capabilities
         super();
@@ -136,11 +118,7 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         createAndRegisterInteractionHandler();
     }
 
-    /**
-     * Create the canvas with the requested OpenGL capabilities
-     *
-     * @param capabilities The capabilities of the canvas, including the OpenGL profile
-     */
+
     public Labyrinth(GLCapabilities capabilities) {
         // Create the canvas with the requested OpenGL capabilities
         super(capabilities);
@@ -149,10 +127,7 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         createAndRegisterInteractionHandler();
     }
 
-    /**
-     * Helper method for creating an interaction handler object and registering it
-     * for key press and mouse interaction callbacks.
-     */
+
     private void createAndRegisterInteractionHandler() {
         // The constructor call of the interaction handler generates meaningful default values
         // Nevertheless the start parameters can be set via setters
@@ -164,12 +139,7 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         this.addMouseWheelListener(interactionHandler);
     }
 
-    /**
-     * Implementation of the OpenGL EventListener (GLEventListener) method
-     * that is called when the OpenGL renderer is started for the first time.
-     *
-     * @param drawable The OpenGL drawable
-     */
+
     @Override
     public void init(GLAutoDrawable drawable) {
         GL3 gl = drawable.getGL().getGL3();
@@ -387,18 +357,26 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         }
 
         initFloor(gl, 420, 1, 440, noOfObjects - 1);
+        initBlender(drawable);
 
-        initSkull(gl, noOfObjects - 2);
-        //initBone(gl, noOfObjects -1 );
-
-        // Specify light parameters
-        float[] lightPosition = {0.0f, 700.0f, 3.0f, 1.0f};
-        float[] lightAmbientColor = {0.6f, 0.7f, 0.8f, 1f};
-        float[] lightDiffuseColor = {0.1f, 0.25f, 0.3f, 1f};
-        float[] lightSpecularColor = {0.3f, 0.4f, 0.5f, 0.6f};
+        // Light of Labyrinth
+        float[] lightPosition = {0.0f, 700.0f, 0f, 0.5f};
+        float[] lightAmbientColor = {0.53333f, 0.11765f, 0.89412f, 1f};
+        float[] lightDiffuseColor = {0.1f, 0.2f, 0.3f, .5f};
+        float[] lightSpecularColor = {0.3f, 0.2f, 0.1f, .5f};
         light0 = new LightSource(lightPosition, lightAmbientColor,
                 lightDiffuseColor, lightSpecularColor);
+
+        // Light of torches
+        float[] lightPosition2 = {0.0f, 30.0f, 0.0f, 1.0f};
+        float[] lightAmbientColor2 = {0.26275f, 0.29412f, 0.30196f, 1f};
+        float[] lightDiffuseColor2 = {0.1f, 0.2f, 0.3f, .5f};
+        float[] lightSpecularColor2 = {0.3f, 0.2f, 0.1f, .5f};
+
+        light1 = new LightSource(lightPosition2, lightAmbientColor2,
+                lightDiffuseColor2, lightSpecularColor2);
         // END: Preparing scene
+
 
         // Switch on back face culling
         gl.glEnable(GL.GL_CULL_FACE);
@@ -415,16 +393,6 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         // END: Preparing scene
     }
 
-    /**
-     * Initializes the GPU for drawing object0
-     * @param gl OpenGL context
-     */
-
-    /**
-     * Initializes the GPU for drawing object1
-     *
-     * @param gl OpenGL context
-     */
     private void initObject(GL3 gl, float width, float height, float depth, int i) {
         // BEGIN: Prepare cube for drawing (object 1)
 
@@ -591,105 +559,39 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         // END: Prepare cube for drawing
     }
 
-    private void initSkull(GL3 gl, int i) {
+    public void initBlender(GLAutoDrawable drawable) {
+        // Retrieve the OpenGL graphics context
+        GL2 gl = drawable.getGL().getGL2();
+        // Outputs information about the available and chosen profile
+        System.err.println("Chosen GLCapabilities: " + drawable.getChosenGLCapabilities());
+        System.err.println("INIT GL IS: " + gl.getClass().getName());
+        System.err.println("GL_VENDOR: " + gl.glGetString(GL.GL_VENDOR));
+        System.err.println("GL_RENDERER: " + gl.glGetString(GL.GL_RENDERER));
+        System.err.println("GL_VERSION: " + gl.glGetString(GL.GL_VERSION));
+
         try {
-            skullVertices = new OBJLoader()
-                    .setLoadNormals(true) // tell the loader to also load normal data
-                    .loadMesh(Resource.file(skullObj)) // actually load the file
-                    .getVertices(); // take the vertices from the loaded mesh
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            skullRotVertices = scaledObj(4, new OBJLoader().setLoadNormals(true).loadMesh(Resource.file(skullRotObj)).getVertices());
+            bigSkullVertices = scaledObj(12, new OBJLoader().setLoadNormals(true).loadMesh(Resource.file(skullObj)).getVertices());
+            torchVertices = scaledObj(1, new OBJLoader().setLoadNormals(true).loadMesh(Resource.file(torchObj)).getVertices());
+            torch180Vertices = scaledObj(1, new OBJLoader().setLoadNormals(true).loadMesh(Resource.file(torch180Obj)).getVertices());
+            boneVertices = scaledObj(0.75f, new OBJLoader().setLoadNormals(true).loadMesh(Resource.file(boneObj)).getVertices());
+            pumpkinVertices = scaledObj(6, new OBJLoader().setLoadNormals(true).loadMesh(Resource.file(pumpkinObj)).getVertices());
         }
-        // Create and activate a vertex array object (VAO)
-
-        gl.glBindVertexArray(vaoName[i]);
-
-        shaderProgram = new ShaderProgram(gl);
-        shaderProgram.loadShaderAndCreateProgram(shaderPath,
-                vertexShaderFileName, fragmentShaderFileName);
-
-
-        // Create, activate and initialize vertex buffer object (VBO)
-        // Used to store vertex data on the GPU.
-        // Creating the buffer on GPU.
-
-        gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboName[i]);
-        // Transferring the vertex data (see above) to the VBO on GPU.
-        // (floats use 4 bytes in Java)
-        gl.glBufferData(GL.GL_ARRAY_BUFFER, (long) skullVertices.length * Float.BYTES,
-                FloatBuffer.wrap(skullVertices), GL.GL_STATIC_DRAW);
-
-        // Activate and map input for the vertex shader from VBO,
-        // taking care of interleaved layout of vertex data (position and color),
-        // Enable layout position 0
-        gl.glEnableVertexAttribArray(0);
-        // Map layout position 0 to the position information per vertex in the VBO.
-        gl.glVertexAttribPointer(0, 3, GL.GL_FLOAT, false, 6 * Float.BYTES, 0);
-        // Enable layout position 1
-        gl.glEnableVertexAttribArray(1);
-        // Map layout position 1 to the color information per vertex in the VBO.
-        gl.glVertexAttribPointer(1, 3, GL.GL_FLOAT, false, 6 * Float.BYTES, 3 * Float.BYTES);
-
-        // Metallic material
-        float[] matEmission = {0.0f, 0.0f, 0.0f, 1.0f};
-        float[] matAmbient = {0.4f, 0.4f, 0.4f, 1.0f};
-        float[] matDiffuse = {0.5f, 0.5f, 0.5f, 1.0f};
-        float[] matSpecular = {0.4f, 0.6f, 0.8f, 1.0f};
-        float matShininess = 1.0f;
-
-        material0 = new Material(matEmission, matAmbient, matDiffuse, matSpecular, matShininess);
-    }
-
-
-    private void initBone(GL3 gl, int i) {
-        try {
-            boneVertices = new OBJLoader()
-                    .setLoadNormals(true) // tell the loader to also load normal data
-                    .loadMesh(Resource.file(boneObj)) // actually load the file
-                    .getVertices(); // take the vertices from the loaded mesh
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        catch (IOException fileException) {
+            fileException.printStackTrace();
+            System.exit(1);
         }
 
-        System.out.println("MESH: " + Arrays.toString(boneVertices));
-        // Create and activate a vertex array object (VAO)
+        // Background color of the GLCanvas
+        gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-        gl.glBindVertexArray(vaoName[i]);
-
-        shaderProgram = new ShaderProgram(gl);
-        shaderProgram.loadShaderAndCreateProgram(shaderPath,
-                vertexShaderFileName, fragmentShaderFileName);
-
-
-        // Create, activate and initialize vertex buffer object (VBO)
-        // Used to store vertex data on the GPU.
-        // Creating the buffer on GPU.
-
-        gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboName[i]);
-        // Transferring the vertex data (see above) to the VBO on GPU.
-        // (floats use 4 bytes in Java)
-        gl.glBufferData(GL.GL_ARRAY_BUFFER, (long) boneVertices.length * Float.BYTES,
-                FloatBuffer.wrap(boneVertices), GL.GL_STATIC_DRAW);
-
-        // Activate and map input for the vertex shader from VBO,
-        // taking care of interleaved layout of vertex data (position and color),
-        // Enable layout position 0
-        gl.glEnableVertexAttribArray(0);
-        // Map layout position 0 to the position information per vertex in the VBO.
-        gl.glVertexAttribPointer(0, 3, GL.GL_FLOAT, false, 6 * Float.BYTES, 0);
-        // Enable layout position 1
-        gl.glEnableVertexAttribArray(1);
-        // Map layout position 1 to the color information per vertex in the VBO.
-        gl.glVertexAttribPointer(1, 3, GL.GL_FLOAT, false, 6 * Float.BYTES, 3 * Float.BYTES);
-
-        // Metallic material
-        float[] matEmission = {0.0f, 0.0f, 0.0f, 1.0f};
-        float[] matAmbient = {0.4f, 0.4f, 0.4f, 1.0f};
-        float[] matDiffuse = {0.5f, 0.5f, 0.5f, 1.0f};
-        float[] matSpecular = {0.4f, 0.6f, 0.8f, 1.0f};
-        float matShininess = 1.0f;
-
-        material0 = new Material(matEmission, matAmbient, matDiffuse, matSpecular, matShininess);
+        // enable shading
+        gl.glEnable(gl.GL_LIGHTING);
+        gl.glEnable(gl.GL_LIGHT0);
+        gl.glCullFace(GL.GL_BACK);
+        gl.glCullFace(GL.GL_FRONT);
+        //gl.glEnable(gl.GL_CULL_FACE);
+        gl.glEnable(gl.GL_DEPTH_TEST);
     }
 
     public void drawCurve(GL2 gl, ArrayList<StopPoint> curvePoints) {
@@ -707,12 +609,6 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
     }
 
 
-    /**
-     * Implementation of the OpenGL EventListener (GLEventListener) method
-     * called by the OpenGL animator for every frame.
-     *
-     * @param drawable The OpenGL drawable
-     */
     @Override
     public void display(GLAutoDrawable drawable) {
         GL3 gl = drawable.getGL().getGL3();
@@ -740,6 +636,8 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         pmvMatrix.glRotatef(interactionHandler.getAngleXaxis(), 1f, 0f, 0f);
         pmvMatrix.glRotatef(interactionHandler.getAngleYaxis(), 0f, 1f, 0f);*/
 
+
+
         //Place all walls
         for (int i = 0; i < noOfWalls; i++) {
             pmvMatrix.glPushMatrix();
@@ -750,8 +648,56 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
 
         pmvMatrix.glPushMatrix();
         pmvMatrix.glTranslatef(0, -25, 0);
-        displayObject2(gl, 21);
+        displayObject(gl, 21);
         pmvMatrix.glPopMatrix();
+
+
+
+        gl.glUniform4fv(3, 1, light1.getPosition(), 0);
+        gl.glUniform4fv(4, 1, light1.getAmbient(), 0);
+        gl.glUniform4fv(5, 1, light1.getDiffuse(), 0);
+        gl.glUniform4fv(6, 1, light1.getSpecular(), 0);
+
+        //display blender .obj
+        displayBigSkull(gl2, -184f, 30, 178);
+        displaySkull(gl2,-170.5f, 0,-75);
+        displaySkull(gl2,-150.5f, 0,-15);
+        displaySkull(gl2,-160.5f, 0,60);
+        displaySkull(gl2,-120.5f, 0,5);
+        displaySkull(gl2,-100.5f, 0,55);
+        displaySkull(gl2,-125.5f, 0,-60);
+        displaySkull(gl2,-90.5f, 0,-85);
+        displaySkull(gl2,-150.5f, 0,80);
+
+        displayTorch(gl2, 82.5f,30,-10);
+        displayTorch(gl2, 132.5f,30,-10);
+        displayTorch(gl2, 132.5f,30,160);
+        displayTorch(gl2, 187.5f,30,160);
+        displayTorch(gl2, 32.5f, 30,150);
+        displayTorch(gl2, 82.f, 30,110);
+        displayTorch(gl2, -67, 30,-55);
+        displayTorch(gl2, -67, 30,35);
+        displayTorch(gl2, 187.5f,30,-10);
+        displayTorch(gl2, 187.5f,30,-178);
+        displayTorch(gl2, 187.5f,30,-126);
+
+        displayTorch180(gl2, -52.5f,30,96);
+        displayTorch180(gl2, -52.5f,30,-96);
+        displayTorch180(gl2, -187.5f, 30,-55);
+        displayTorch180(gl2, -187.5f,30,35);
+        displayTorch180(gl2, -187.5f,30,-178);
+
+        displayBone(gl2,-150.5f, 2,-100);
+        displayBone(gl2,-100.5f, 2,70);
+        displayBone(gl2,-130.5f, 2,30);
+        displayBone(gl2,-105.5f, 2,100);
+        displayBone(gl2,-180.5f, 2,-5);
+        displayBone(gl2,-120.5f, 2,-40);
+        displayBone(gl2,-135.5f, 2,-80);
+        displayBone(gl2,-125.5f, 2,10);
+
+        //displayPumpkin(gl2, 0,0,0);
+        //displayPumpkin(gl2, 15, 15,15);
 
 
         gl.glBindVertexArray(vaoName[noOfWalls]);
@@ -767,8 +713,6 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         // Transfer model-view matrix via layout position 1
         gl.glUniformMatrix4fv(1, 1, false, pmvMatrix.glGetMvMatrixf());
 
-        // Use the vertices in the VBO to draw a triangle.
-        gl.glDrawArrays(GL.GL_TRIANGLES, 0, skullVertices.length);
         drawCurve(gl2, curvePoints);
         //gl.glDrawArrays(GL.GL_TRIANGLES, 0, boneVertices.length);
     }
@@ -900,45 +844,176 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         gl.glDrawElements(GL.GL_TRIANGLE_STRIP, BoxTex.noOfIndicesForBox(), GL.GL_UNSIGNED_INT, 0);
     }
 
-    private void displayObject2(GL3 gl, int i) {
-        // BEGIN: Draw the second object (object 1)
-        gl.glUseProgram(shaderProgram0.getShaderProgramID());
-        // Transfer the PVM-Matrix (model-view and projection matrix) to the vertex shader
-        gl.glUniformMatrix4fv(0, 1, false, pmvMatrix.glGetPMatrixf());
-        gl.glUniformMatrix4fv(1, 1, false, pmvMatrix.glGetMvMatrixf());
-        gl.glUniformMatrix4fv(2, 1, false, pmvMatrix.glGetMvitMatrixf());
-        // transfer parameters of light source
-        gl.glUniform4fv(3, 1, light0.getPosition(), 0);
-        gl.glUniform4fv(4, 1, light0.getAmbient(), 0);
-        gl.glUniform4fv(5, 1, light0.getDiffuse(), 0);
-        gl.glUniform4fv(6, 1, light0.getSpecular(), 0);
-        // transfer material parameters
-        gl.glUniform4fv(7, 1, material0.getEmission(), 0);
-        gl.glUniform4fv(8, 1, material0.getAmbient(), 0);
-        gl.glUniform4fv(9, 1, material0.getDiffuse(), 0);
-        gl.glUniform4fv(10, 1, material0.getSpecular(), 0);
-        gl.glUniform1f(11, material0.getShininess());
+    public void displaySkull(GL2 gl, float xCoor, float yCoor, float zCoor) {
 
-        gl.glBindVertexArray(vaoName[i]);
+        // BEGIN: definition of scene content (i.e. objects, models)
+        gl.glBegin(GL.GL_TRIANGLES);
+        {
+            //float[] rotObj = rotatedObj(deg, skullVertices);
 
-        // Draws the elements in the order defined by the index buffer object (IBO)
-        gl.glDrawElements(GL.GL_TRIANGLE_STRIP, BoxTex.noOfIndicesForBox(), GL.GL_UNSIGNED_INT, 0);
+            for (int vertexIndex = 0; vertexIndex + 5 < skullRotVertices.length; vertexIndex += 6) {
+                float x = skullRotVertices[vertexIndex] + xCoor;
+                float y = skullRotVertices[vertexIndex + 1] + yCoor;
+                float z = skullRotVertices[vertexIndex + 2] + zCoor;
+
+                float nx = skullRotVertices[vertexIndex + 3];
+                float ny = skullRotVertices[vertexIndex + 4];
+                float nz = skullRotVertices[vertexIndex + 5];
+
+                gl.glNormal3f(nx, ny, nz);
+                gl.glVertex3f(x, y, z);
+            }
+        }
+        gl.glEnd();
+        // END: definition of scene content
     }
 
+    public void displayBigSkull(GL2 gl, float xCoor, float yCoor, float zCoor) {
 
-    /**
-     * Implementation of the OpenGL EventListener (GLEventListener) method
-     * called when the OpenGL window is resized.
-     *
-     * @param drawable The OpenGL drawable
-     * @param x
-     * @param y
-     * @param width
-     * @param height
-     */
+        // BEGIN: definition of scene content (i.e. objects, models)
+        gl.glBegin(GL.GL_TRIANGLES);
+        {
+            //float[] rotObj = rotatedObj(deg, skullVertices);
+
+            for (int vertexIndex = 0; vertexIndex + 5 < bigSkullVertices.length; vertexIndex += 6) {
+                float x = bigSkullVertices[vertexIndex] + xCoor;
+                float y = bigSkullVertices[vertexIndex + 1] + yCoor;
+                float z = bigSkullVertices[vertexIndex + 2] + zCoor;
+
+                float nx = bigSkullVertices[vertexIndex + 3];
+                float ny = bigSkullVertices[vertexIndex + 4];
+                float nz = bigSkullVertices[vertexIndex + 5];
+
+                gl.glNormal3f(nx, ny, nz);
+                gl.glVertex3f(x, y, z);
+            }
+        }
+        gl.glEnd();
+        // END: definition of scene content
+    }
+
+    public void displayTorch(GL2 gl, float xCoor, float yCoor, float zCoor) {
+
+        // BEGIN: definition of scene content (i.e. objects, models)
+        gl.glBegin(GL.GL_TRIANGLES);
+        {
+
+            for (int vertexIndex = 0; vertexIndex + 5 < torchVertices.length; vertexIndex += 6) {
+                float x = torchVertices[vertexIndex] + xCoor;
+                float y = torchVertices[vertexIndex + 1] + yCoor;
+                float z = torchVertices[vertexIndex + 2] + zCoor;
+
+                float nx = torchVertices[vertexIndex + 3];
+                float ny = torchVertices[vertexIndex + 4];
+                float nz = torchVertices[vertexIndex + 5];
+
+                gl.glNormal3f(nx, ny, nz);
+                gl.glVertex3f(x, y, z);
+            }
+
+        }
+        gl.glEnd();
+        // END: definition of scene content
+    }
+
+    public void displayTorch180(GL2 gl, float xCoor, float yCoor, float zCoor) {
+
+        // BEGIN: definition of scene content (i.e. objects, models)
+        gl.glBegin(GL.GL_TRIANGLES);
+        {
+
+            for (int vertexIndex = 0; vertexIndex + 5 < torch180Vertices.length; vertexIndex += 6) {
+                float x = torch180Vertices[vertexIndex] + xCoor;
+                float y = torch180Vertices[vertexIndex + 1] + yCoor;
+                float z = torch180Vertices[vertexIndex + 2] + zCoor;
+
+                float nx = torch180Vertices[vertexIndex + 3];
+                float ny = torch180Vertices[vertexIndex + 4];
+                float nz = torch180Vertices[vertexIndex + 5];
+
+                gl.glNormal3f(nx, ny, nz);
+                gl.glVertex3f(x, y, z);
+            }
+
+        }
+        gl.glEnd();
+        // END: definition of scene content
+    }
+
+    public void displayBone(GL2 gl, float xCoor, float yCoor, float zCoor) {
+
+        // BEGIN: definition of scene content (i.e. objects, models)
+        gl.glBegin(GL.GL_TRIANGLES);
+        {
+
+            for (int vertexIndex = 0; vertexIndex + 5 < boneVertices.length; vertexIndex += 6) {
+                float x = boneVertices[vertexIndex] + xCoor;
+                float y = boneVertices[vertexIndex + 1] + yCoor;
+                float z = boneVertices[vertexIndex + 2] + zCoor;
+
+                float nx = boneVertices[vertexIndex + 3];
+                float ny = boneVertices[vertexIndex + 4];
+                float nz = boneVertices[vertexIndex + 5];
+
+                gl.glNormal3f(nx, ny, nz);
+                gl.glVertex3f(x, y, z);
+            }
+
+        }
+        gl.glEnd();
+        // END: definition of scene content
+    }
+
+    public void displayPumpkin(GL2 gl, float xCoor, float yCoor, float zCoor) {
+
+        // BEGIN: definition of scene content (i.e. objects, models)
+        gl.glBegin(GL.GL_TRIANGLES);
+        {
+
+            for (int vertexIndex = 0; vertexIndex + 5 < pumpkinVertices.length; vertexIndex += 6) {
+                float x = pumpkinVertices[vertexIndex] + xCoor;
+                float y = pumpkinVertices[vertexIndex + 1] + yCoor;
+                float z = pumpkinVertices[vertexIndex + 2] + zCoor;
+
+                float nx = pumpkinVertices[vertexIndex + 3];
+                float ny = pumpkinVertices[vertexIndex + 4];
+                float nz = pumpkinVertices[vertexIndex + 5];
+
+                gl.glNormal3f(nx, ny, nz);
+                gl.glVertex3f(x, y, z);
+            }
+
+        }
+        gl.glEnd();
+        // END: definition of scene content
+    }
+/*
+    private float[] rotatedObj(float rotation, float[] objRotated) {
+
+        for (int i = 0; i < objRotated.length / 6; i++) {
+            objRotated[i*3] = (cos((float) Math.toRadians(rotation))) * objRotated[i*3] + (sin((float) Math.toRadians(rotation)) * objRotated[i*3]);
+            objRotated[i*3+2] = (-sin((float) Math.toRadians(rotation))) * objRotated[i*3+2] + cos(((float) Math.toRadians(rotation))) * objRotated[i*3+2];
+            objRotated[i*3+3] = (cos((float) Math.toRadians(rotation))) * objRotated[i*3+3] + (sin((float) Math.toRadians(rotation)) * objRotated[i*3+3]);
+            objRotated[i*3+5] = (-sin((float) Math.toRadians(rotation))) * objRotated[i*3+5] + cos(((float) Math.toRadians(rotation))) * objRotated[i*3+5];
+        }
+
+        return objRotated;
+    }
+*/
+
+    private float[] scaledObj (float factor, float[] objScaled) {
+
+        for (int i=0; i < objScaled.length / 3; i++) {
+            objScaled[i*3] = factor * objScaled[i*3];
+            objScaled[i*3+1] = factor * objScaled[i*3+1];
+            objScaled[i*3+2] = factor * objScaled[i*3+2];
+        }
+
+        return objScaled;
+    }
+
     @Override
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
-        GL3 gl = drawable.getGL().getGL3();
         System.out.println("Reshape called.");
         System.out.println("x = " + x + ", y = " + y + ", width = " + width + ", height = " + height);
 
@@ -947,12 +1022,6 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         pmvMatrix.gluPerspective(45f, (float) width / (float) height, 0.01f, 10000f);
     }
 
-    /**
-     * Implementation of the OpenGL EventListener (GLEventListener) method
-     * called when OpenGL canvas ist destroyed.
-     *
-     * @param drawable
-     */
     @Override
     public void dispose(GLAutoDrawable drawable) {
         System.out.println("Deleting allocated objects, incl. shader program.");

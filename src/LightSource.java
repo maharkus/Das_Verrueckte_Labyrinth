@@ -11,9 +11,6 @@ public class LightSource {
     private float[] diffuse;
     private float[] specular;
 
-    public LightSource() {
-    }
-
     public LightSource(float[] position, float[] ambient, float[] diffuse, float[] specular) {
         this.position = position;
         this.ambient = ambient;
