@@ -241,9 +241,9 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
                 //12
                 {16.5f, 0.3f, -12f},
                 //13
-                {11.5f, 0.3f, 2f},
-                //14
                 {11.5f, 0.3f, -7f},
+                //14
+                {11.5f, 0.3f, 2f},
                 //15
                 {4.5f, 0.3f, -7f},
                 //16
