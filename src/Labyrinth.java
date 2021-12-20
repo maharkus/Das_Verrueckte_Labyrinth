@@ -76,6 +76,8 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
     // Define light sources
     private LightSource light0;
     private LightSource light1;
+    private LightSource light2;
+    private LightSource light3;
 
     // Object for handling keyboard and mouse interaction
     private InteractionHandler interactionHandler;
@@ -375,6 +377,25 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
 
         light1 = new LightSource(lightPosition2, lightAmbientColor2,
                 lightDiffuseColor2, lightSpecularColor2);
+
+        // Light of bones/skulls
+        float[] lightPosition3 = {0.0f, 0f, 0.0f, 1.0f};
+        float[] lightAmbientColor3 = {1f, 1f, 1f, 1f};
+        float[] lightDiffuseColor3 = {0.1f, 0.1f, 0.1f, .5f};
+        float[] lightSpecularColor3 = {0.1f, 0.1f, 0.1f, .5f};
+
+        light2 = new LightSource(lightPosition3, lightAmbientColor3,
+                lightDiffuseColor3, lightSpecularColor3);
+
+        // Light of pumpkin
+        float[] lightPosition4 = {0.0f, 0f, 0.0f, 1.0f};
+        float[] lightAmbientColor4 = {1f, 0.4f, 0f, 1f};
+        float[] lightDiffuseColor4 = {1f, 0.4f, 0f, .5f};
+        float[] lightSpecularColor4 = {1f, 0.4f, 0f, .5f};
+        //0.64706f
+
+        light3 = new LightSource(lightPosition4, lightAmbientColor4,
+                lightDiffuseColor4, lightSpecularColor4);
         // END: Preparing scene
 
 
@@ -637,7 +658,6 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         pmvMatrix.glRotatef(interactionHandler.getAngleYaxis(), 0f, 1f, 0f);*/
 
 
-
         //Place all walls
         for (int i = 0; i < noOfWalls; i++) {
             pmvMatrix.glPushMatrix();
@@ -653,10 +673,6 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
 
 
 
-        gl.glUniform4fv(3, 1, light1.getPosition(), 0);
-        gl.glUniform4fv(4, 1, light1.getAmbient(), 0);
-        gl.glUniform4fv(5, 1, light1.getDiffuse(), 0);
-        gl.glUniform4fv(6, 1, light1.getSpecular(), 0);
 
         //display blender .obj
         displayBigSkull(gl2, -184f, 30, 178);
@@ -847,58 +863,16 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         gl.glDrawElements(GL.GL_TRIANGLE_STRIP, BoxTex.noOfIndicesForBox(), GL.GL_UNSIGNED_INT, 0);
     }
 
-    public void displaySkull(GL2 gl, float xCoor, float yCoor, float zCoor) {
-
-        // BEGIN: definition of scene content (i.e. objects, models)
-        gl.glBegin(GL.GL_TRIANGLES);
-        {
-            //float[] rotObj = rotatedObj(deg, skullVertices);
-
-            for (int vertexIndex = 0; vertexIndex + 5 < skullRotVertices.length; vertexIndex += 6) {
-                float x = skullRotVertices[vertexIndex] + xCoor;
-                float y = skullRotVertices[vertexIndex + 1] + yCoor;
-                float z = skullRotVertices[vertexIndex + 2] + zCoor;
-
-                float nx = skullRotVertices[vertexIndex + 3];
-                float ny = skullRotVertices[vertexIndex + 4];
-                float nz = skullRotVertices[vertexIndex + 5];
-
-                gl.glNormal3f(nx, ny, nz);
-                gl.glVertex3f(x, y, z);
-            }
-        }
-        gl.glEnd();
-        // END: definition of scene content
-    }
-
-    public void displayBigSkull(GL2 gl, float xCoor, float yCoor, float zCoor) {
-
-        // BEGIN: definition of scene content (i.e. objects, models)
-        gl.glBegin(GL.GL_TRIANGLES);
-        {
-            //float[] rotObj = rotatedObj(deg, skullVertices);
-
-            for (int vertexIndex = 0; vertexIndex + 5 < bigSkullVertices.length; vertexIndex += 6) {
-                float x = bigSkullVertices[vertexIndex] + xCoor;
-                float y = bigSkullVertices[vertexIndex + 1] + yCoor;
-                float z = bigSkullVertices[vertexIndex + 2] + zCoor;
-
-                float nx = bigSkullVertices[vertexIndex + 3];
-                float ny = bigSkullVertices[vertexIndex + 4];
-                float nz = bigSkullVertices[vertexIndex + 5];
-
-                gl.glNormal3f(nx, ny, nz);
-                gl.glVertex3f(x, y, z);
-            }
-        }
-        gl.glEnd();
-        // END: definition of scene content
-    }
-
     public void displayTorch(GL2 gl, float xCoor, float yCoor, float zCoor) {
 
+        gl.glUniform4fv(3, 1, light1.getPosition(), 0);
+        gl.glUniform4fv(4, 1, light1.getAmbient(), 0);
+        gl.glUniform4fv(5, 1, light1.getDiffuse(), 0);
+        gl.glUniform4fv(6, 1, light1.getSpecular(), 0);
+
         // BEGIN: definition of scene content (i.e. objects, models)
         gl.glBegin(GL.GL_TRIANGLES);
+
         {
 
             for (int vertexIndex = 0; vertexIndex + 5 < torchVertices.length; vertexIndex += 6) {
@@ -943,7 +917,71 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         // END: definition of scene content
     }
 
+    public void displayBigSkull(GL2 gl, float xCoor, float yCoor, float zCoor) {
+
+        gl.glUniform4fv(3, 1, light2.getPosition(), 0);
+        gl.glUniform4fv(4, 1, light2.getAmbient(), 0);
+        gl.glUniform4fv(5, 1, light2.getDiffuse(), 0);
+        gl.glUniform4fv(6, 1, light2.getSpecular(), 0);
+
+        // BEGIN: definition of scene content (i.e. objects, models)
+        gl.glBegin(GL.GL_TRIANGLES);
+        {
+            //float[] rotObj = rotatedObj(deg, skullVertices);
+
+            for (int vertexIndex = 0; vertexIndex + 5 < bigSkullVertices.length; vertexIndex += 6) {
+                float x = bigSkullVertices[vertexIndex] + xCoor;
+                float y = bigSkullVertices[vertexIndex + 1] + yCoor;
+                float z = bigSkullVertices[vertexIndex + 2] + zCoor;
+
+                float nx = bigSkullVertices[vertexIndex + 3];
+                float ny = bigSkullVertices[vertexIndex + 4];
+                float nz = bigSkullVertices[vertexIndex + 5];
+
+                gl.glNormal3f(nx, ny, nz);
+                gl.glVertex3f(x, y, z);
+            }
+        }
+        gl.glEnd();
+        // END: definition of scene content
+    }
+
+    public void displaySkull(GL2 gl, float xCoor, float yCoor, float zCoor) {
+
+        gl.glUniform4fv(3, 1, light2.getPosition(), 0);
+        gl.glUniform4fv(4, 1, light2.getAmbient(), 0);
+        gl.glUniform4fv(5, 1, light2.getDiffuse(), 0);
+        gl.glUniform4fv(6, 1, light2.getSpecular(), 0);
+
+        // BEGIN: definition of scene content (i.e. objects, models)
+        gl.glBegin(GL.GL_TRIANGLES);
+        {
+            //float[] rotObj = rotatedObj(deg, skullVertices);
+
+            for (int vertexIndex = 0; vertexIndex + 5 < skullRotVertices.length; vertexIndex += 6) {
+                float x = skullRotVertices[vertexIndex] + xCoor;
+                float y = skullRotVertices[vertexIndex + 1] + yCoor;
+                float z = skullRotVertices[vertexIndex + 2] + zCoor;
+
+                float nx = skullRotVertices[vertexIndex + 3];
+                float ny = skullRotVertices[vertexIndex + 4];
+                float nz = skullRotVertices[vertexIndex + 5];
+
+                gl.glNormal3f(nx, ny, nz);
+                gl.glVertex3f(x, y, z);
+            }
+        }
+        gl.glEnd();
+        // END: definition of scene content
+    }
+
+
     public void displayBone(GL2 gl, float xCoor, float yCoor, float zCoor) {
+
+        gl.glUniform4fv(3, 1, light2.getPosition(), 0);
+        gl.glUniform4fv(4, 1, light2.getAmbient(), 0);
+        gl.glUniform4fv(5, 1, light2.getDiffuse(), 0);
+        gl.glUniform4fv(6, 1, light2.getSpecular(), 0);
 
         // BEGIN: definition of scene content (i.e. objects, models)
         gl.glBegin(GL.GL_TRIANGLES);
@@ -968,6 +1006,11 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
     }
 
     public void displayPumpkin(GL2 gl, float xCoor, float yCoor, float zCoor) {
+
+        gl.glUniform4fv(3, 1, light3.getPosition(), 0);
+        gl.glUniform4fv(4, 1, light3.getAmbient(), 0);
+        gl.glUniform4fv(5, 1, light3.getDiffuse(), 0);
+        gl.glUniform4fv(6, 1, light3.getSpecular(), 0);
 
         // BEGIN: definition of scene content (i.e. objects, models)
         gl.glBegin(GL.GL_TRIANGLES);
