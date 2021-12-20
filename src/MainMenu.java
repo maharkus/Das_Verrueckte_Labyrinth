@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.font.*;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -15,7 +16,7 @@ public class MainMenu {
         button.setPreferredSize(new Dimension(width, height));
         button.setForeground(Color.WHITE);
         button.setBackground(new Color(102, 0, 153));
-        button.setFont(new Font("Futura", 0, 20));
+        button.setFont(new Font("Futura", Font.BOLD, 40));
         button.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         button.setOpaque(true);
         button.setBorderPainted(false);
@@ -38,7 +39,7 @@ public class MainMenu {
         button.setPreferredSize(new Dimension(width, height));
         button.setForeground(Color.WHITE);
         button.setBackground(new Color(0, 0, 0));
-        button.setFont(new Font("Futura", 0, 20));
+        button.setFont(new Font("Futura", Font.BOLD, 40));
         button.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         button.setOpaque(true);
         button.setBorderPainted(false);
@@ -61,7 +62,7 @@ public class MainMenu {
         JFrame frame = new JFrame();
         ImagePanel panel = new ImagePanel((new ImageIcon("resources/laby.jpg")).getImage());
         JLabel header = new JLabel("Das Verrückte Labyrinth", 0);
-        header.setFont(new Font("Futura", 0, 32));
+        header.setFont(new Font("Futura", Font.BOLD, 32));
         header.setForeground(Color.WHITE);
         panel.setBorder(BorderFactory.createEmptyBorder(50, 200, 50, 200));
         panel.setBackground(Color.BLACK);
@@ -74,6 +75,7 @@ public class MainMenu {
         panel.add(ExitButton("EXIT", 50, 100));
         frame.setTitle("Das Verrückkte Labyrinth");
         frame.setSize(1000, 700);
+        frame.setResizable(false);
         frame.setLocationRelativeTo((Component)null);
         frame.setDefaultCloseOperation(3);
         frame.setVisible(true);
