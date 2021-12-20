@@ -691,13 +691,16 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         displayBone(gl2,-100.5f, 2,70);
         displayBone(gl2,-130.5f, 2,30);
         displayBone(gl2,-105.5f, 2,100);
-        displayBone(gl2,-180.5f, 2,-5);
-        displayBone(gl2,-120.5f, 2,-40);
+        displayBone(gl2,-170.5f, 2,-15);
+        displayBone(gl2,-110.5f, 2,-30);
         displayBone(gl2,-135.5f, 2,-80);
-        displayBone(gl2,-125.5f, 2,10);
+        displayBone(gl2,-125.5f, 2,140);
 
-        //displayPumpkin(gl2, 0,0,0);
-        //displayPumpkin(gl2, 15, 15,15);
+        displayPumpkin(gl2, -160,5,162);
+        displayPumpkin(gl2, 180,5,-192);
+        displayPumpkin(gl2, 102,5,62);
+        displayPumpkin(gl2, -180, 5,-130);
+        displayPumpkin(gl2, -180, 5,-130);
 
 
         gl.glBindVertexArray(vaoName[noOfWalls]);
