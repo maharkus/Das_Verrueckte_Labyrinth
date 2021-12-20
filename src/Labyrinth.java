@@ -1,16 +1,16 @@
 /**
  * Copyright 2012-2013 JogAmp Community. All rights reserved.
- *
+ * <p>
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
- *
- *    1. Redistributions of source code must retain the above copyright notice, this list of
- *       conditions and the following disclaimer.
- *
- *    2. Redistributions in binary form must reproduce the above copyright notice, this list
- *       of conditions and the following disclaimer in the documentation and/or other materials
- *       provided with the distribution.
- *
+ * <p>
+ * 1. Redistributions of source code must retain the above copyright notice, this list of
+ * conditions and the following disclaimer.
+ * <p>
+ * 2. Redistributions in binary form must reproduce the above copyright notice, this list
+ * of conditions and the following disclaimer in the documentation and/or other materials
+ * provided with the distribution.
+ * <p>
  * THIS SOFTWARE IS PROVIDED BY JogAmp Community ``AS IS'' AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
  * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL JogAmp Community OR
@@ -20,7 +20,7 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
+ * <p>
  * The views and conclusions contained in the software and documentation are those of the
  * authors and should not be interpreted as representing official policies, either expressed
  * or implied, of JogAmp Community.
@@ -32,7 +32,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
+import java.util.*;
 
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.awt.GLCanvas;
@@ -42,33 +42,34 @@ import com.jogamp.opengl.util.texture.TextureIO;
 import de.hshl.obj.loader.OBJLoader;
 import de.hshl.obj.loader.Resource;
 
-import static com.jogamp.opengl.GL.GL_TEXTURE0;
-import static com.jogamp.opengl.GL.GL_TEXTURE_2D;
+import static com.jogamp.opengl.GL.*;
+import static com.jogamp.opengl.GL2.GL_MAP1_VERTEX_3;
+import static com.jogamp.opengl.math.FloatUtil.cos;
+import static java.lang.Math.sin;
 
 /**
  * Performs the OpenGL graphics processing using the Programmable Pipeline and the
  * OpenGL Core profile
- *
+ * <p>
  * Starts an animation loop.
  * Zooming and rotation of the Camera is included (see InteractionHandler).
- * 	Use: left/right/up/down-keys and +/-Keys
+ * Use: left/right/up/down-keys and +/-Keys
  * Draws a simple box with light and textures.
  * Serves as a template (start code) for setting up an OpenGL/Jogl application
  * using a vertex and fragment shader.
- *
+ * <p>
  * Please make sure setting the file path and names of the shader correctly (see below).
- *
+ * <p>
  * Core code is based on a tutorial by Chua Hock-Chuan
  * http://www3.ntu.edu.sg/home/ehchua/programming/opengl/JOGL2.0.html
- *
+ * <p>
  * and on an example by Xerxes Rånby
  * http://jogamp.org/git/?p=jogl-demos.git;a=blob;f=src/demos/es2/RawGL2ES2demo.java;hb=HEAD
  *
  * @author Karsten Lehn
  * @version 12.11.2017, 18.9.2019
- *
  */
-public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
+public class Labyrinth extends GLCanvas implements GLEventListener {
 
     private static final long serialVersionUID = 1L;
 
@@ -82,17 +83,15 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
 
     // taking texture files from relative path
     private final String texturePath = ".\\resources\\";
-    //    final String textureFileName = "GelbGruenPalette.png";
     final String textureFileName = "wall3.jpg";
-    final String floorTextureName = "dwayne_rock.jpg";
 
     private ShaderProgram shaderProgram0;
     private ShaderProgram shaderProgram;
 
     // Pointers (names) for data transfer and handling on GPU
     private int[] vaoName;  // Name of vertex array object
-    private int[] vboName;	// Name of vertex buffer object
-    private int[] iboName;	// Name of index buffer object
+    private int[] vboName;    // Name of vertex buffer object
+    private int[] iboName;    // Name of index buffer object
 
     // Define Materials
     private Material material0;
@@ -105,10 +104,19 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
     // Projection model view matrix tool
     private PMVMatrix pmvMatrix;
 
+
+    Player player;
+    float[] nextFocus = new float[3];
+    boolean focusSet = false;
+
+    enum directions {
+        right, up, left, down, stay
+    }
+
     private int noOfObjects;
     private int noOfWalls;
     private float[] wallPos;
-
+    ArrayList<StopPoint> curvePoints = new ArrayList<>();
 
     final Path skullObj = Paths.get("./resources/models/Skull.obj");
     final Path boneObj = Paths.get("./resources/models/Bone.obj");
@@ -120,7 +128,7 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
     /**
      * Standard constructor for object creation.
      */
-    public BoxLightTexRendererPP() {
+    public Labyrinth() {
         // Create the canvas with default capabilities
         super();
         // Add this object as OpenGL event listener
@@ -130,9 +138,10 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
 
     /**
      * Create the canvas with the requested OpenGL capabilities
+     *
      * @param capabilities The capabilities of the canvas, including the OpenGL profile
      */
-    public BoxLightTexRendererPP(GLCapabilities capabilities) {
+    public Labyrinth(GLCapabilities capabilities) {
         // Create the canvas with the requested OpenGL capabilities
         super(capabilities);
         // Add this object as an OpenGL event listener
@@ -158,6 +167,7 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
     /**
      * Implementation of the OpenGL EventListener (GLEventListener) method
      * that is called when the OpenGL renderer is started for the first time.
+     *
      * @param drawable The OpenGL drawable
      */
     @Override
@@ -171,10 +181,16 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
         System.err.println("GL_VERSION: " + gl.glGetString(GL.GL_VERSION));
 
         // Verify if VBO-Support is available
-        if(!gl.isExtensionAvailable("GL_ARB_vertex_buffer_object"))
+        if (!gl.isExtensionAvailable("GL_ARB_vertex_buffer_object"))
             System.out.println("Error: VBO support is missing");
         else
             System.out.println("VBO support is available");
+
+
+        //Create Player
+        player = new Player(new float[]{-155f, 0.3f, 240f}, new float[]{-155f, 0.3f, 0f});
+        nextFocus = changeFocusPoint(player.getPosition(), player.getFocus(), 1 / 2f);
+
 
         // BEGIN: Preparing scene
         float[] wallSizes = new float[]{
@@ -186,7 +202,7 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
                 10, 50, 110,
                 10, 50, 110,
                 10, 50, 210,
-                150, 50, 10,
+                210, 50, 10,
                 10, 50, 110,
                 50, 50, 10,
                 10, 50, 50,
@@ -202,16 +218,16 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
                 20, 50, 400,
         };
 
-        wallPos = new float[] {
+        wallPos = new float[]{
                 90, 0, -150,
                 -60, 0, -100,
                 -125, 0, -150,
                 -10, 0, -50,
-                90, 0, -100,
+                40, 0, -100,
                 140, 0, 0,
                 140, 0, 150,
                 90, 0, 50,
-                60, 0, 50,
+                40, 0, 50,
                 40, 0, 150,
                 20, 0, 100,
                 -10, 0, 120,
@@ -227,8 +243,124 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
                 200, 0, 0,
         };
 
+        float[][] positions = new float[][]{
+                //0
+                {-15.5f, 0.3f, 18f},
+                //1
+                {-3f, 0.3f, 18f},
+                //2
+                {1.5f, 0.3f, 18f},
+                //3
+                {1.5f, 0.3f, 13f},
+                //4
+                {-3f, 0.3f, 8f},
+                //5
+                {6.5f, 0.3f, 8f},
+                //6
+                {6.5f, 0.3f, 18f},
+                //7
+                {11f, 0.3f, 18f},
+                //8
+                {11f, 0.3f, 8f},
+                //9
+                {16.5f, 0.3f, 8f},
+                //10
+                {16.5f, 0.3f, 18f},
+                //11
+                {16.5f, 0.3f, -7f},
+                //12
+                {16.5f, 0.3f, -12f},
+                //13
+                {11.5f, 0.3f, 2f},
+                //14
+                {11.5f, 0.3f, -7f},
+                //15
+                {4.5f, 0.3f, -7f},
+                //16
+                {4.5f, 0.3f, -1f},
+                //17
+                {4.5f, 0.3f, 2f},
+                //18
+                {-3.5f, 0.3f, 2f},
+                //19
+                {-3.5f, 0.3f, -1f},
+                //20
+                {-9f, 0.3f, -1f},
+                //21
+                {-3.5f, 0.3f, -12f},
+                //22
+                {-3.5f, 0.3f, -18f},
+                //23
+                {-15.5f, 0.3f, -18f},
+                //24
+                {15f, 0.3f, -18f},
+                //25
+                {15f, 0.3f, -22f}
+        };
+
+        int[][] directions = new int[][]{
+                //0
+                {1, 0, 0, 0},
+                //1
+                {2, 4, 0, 1},
+                //2
+                {2, 3, 1, 2},
+                //3
+                {3, 3, 3, 2},
+                //4
+                {5, 4, 4, 1},
+                //5
+                {5, 5, 4, 6},
+                //6
+                {7, 5, 6, 6},
+                //7
+                {7, 8, 6, 7},
+                //8
+                {9, 8, 8, 7},
+                //9
+                {9, 11, 8, 10},
+                //10
+                {10, 9, 10, 10},
+                //11
+                {11, 12, 13, 9},
+                //12
+                {12, 12, 21, 11},
+                //13
+                {11, 13, 15, 14},
+                //14
+                {14, 13, 14, 14},
+                //15
+                {13, 15, 15, 16},
+                //16
+                {16, 15, 16, 17},
+                //17
+                {17, 16, 18, 17},
+                //18
+                {17, 19, 18, 18},
+                //19
+                {19, 19, 20, 18},
+                //20
+                {19, 20, 20, 20},
+                //21
+                {12, 22, 21, 21},
+                //22
+                {24, 22, 23, 21},
+                //23
+                {22, 23, 23, 23},
+                //24
+                {22, 25, 22, 24},
+                //25
+                {25, 25, 25, 24}
+
+        };
+
+        for (int i = 0; i < positions.length; i++) {
+            curvePoints.add(i, new StopPoint(positions[i], directions[i]));
+        }
+
+
         // BEGIN: Allocating vertex array objects and buffers for each object
-        noOfWalls = wallSizes.length/3;
+        noOfWalls = wallSizes.length / 3;
         noOfObjects = noOfWalls + 2;
         // create vertex array objects for noOfObjects objects (VAO)
         vaoName = new int[noOfObjects];
@@ -256,7 +388,7 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
 
         initFloor(gl, 420, 1, 440, noOfObjects - 1);
 
-        initSkull(gl, noOfObjects - 2 );
+        initSkull(gl, noOfObjects - 2);
         //initBone(gl, noOfObjects -1 );
 
         // Specify light parameters
@@ -290,12 +422,13 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
 
     /**
      * Initializes the GPU for drawing object1
+     *
      * @param gl OpenGL context
      */
-    private void initObject(GL3 gl, float width,float height, float depth, int i) {
+    private void initObject(GL3 gl, float width, float height, float depth, int i) {
         // BEGIN: Prepare cube for drawing (object 1)
 
-        float[] color= {1f, 1f, 1f, 1f};
+        float[] color = {1f, 1f, 1f, 1f};
         gl.glBindVertexArray(vaoName[i]);
         shaderProgram0 = new ShaderProgram(gl);
         shaderProgram0.loadShaderAndCreateProgram(shaderPath,
@@ -321,16 +454,16 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
         // Defining input for vertex shader
         // Pointer for the vertex shader to the position information per vertex
         gl.glEnableVertexAttribArray(0);
-        gl.glVertexAttribPointer(0, 3, GL.GL_FLOAT, false, 11*4, 0);
+        gl.glVertexAttribPointer(0, 3, GL.GL_FLOAT, false, 11 * 4, 0);
         // Pointer for the vertex shader to the color information per vertex
         gl.glEnableVertexAttribArray(1);
-        gl.glVertexAttribPointer(1, 3, GL.GL_FLOAT, false, 11*4, 3*4);
+        gl.glVertexAttribPointer(1, 3, GL.GL_FLOAT, false, 11 * 4, 3 * 4);
         // Pointer for the vertex shader to the normal information per vertex
         gl.glEnableVertexAttribArray(2);
-        gl.glVertexAttribPointer(2, 3, GL.GL_FLOAT, false, 11*4, 6*4);
+        gl.glVertexAttribPointer(2, 3, GL.GL_FLOAT, false, 11 * 4, 6 * 4);
         // Pointer for the vertex shader to the texture coordinates information per vertex
         gl.glEnableVertexAttribArray(3);
-        gl.glVertexAttribPointer(3, 2, GL.GL_FLOAT, false, 11*4, 9*4);
+        gl.glVertexAttribPointer(3, 2, GL.GL_FLOAT, false, 11 * 4, 9 * 4);
 
         // Specification of material parameters (blue material)
 //        float[] matEmission = {0.0f, 0.0f, 0.0f, 1.0f};
@@ -341,8 +474,8 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
 
         // Metallic material
         float[] matEmission = {0.0f, 0.0f, 0.0f, 1.0f};
-        float[] matAmbient =  {0.4f, 0.4f, 0.4f, 1.0f};
-        float[] matDiffuse =  {0.5f, 0.5f, 0.5f, 1.0f};
+        float[] matAmbient = {0.4f, 0.4f, 0.4f, 1.0f};
+        float[] matDiffuse = {0.5f, 0.5f, 0.5f, 1.0f};
         float[] matSpecular = {0.4f, 0.6f, 0.8f, 1.0f};
         float matShininess = 1.0f;
 
@@ -362,7 +495,7 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
             e.printStackTrace();
         }
         if (texture != null)
-            System.out.println("Texture loaded successfully from: " + texturePath+textureFileName);
+            System.out.println("Texture loaded successfully from: " + texturePath + textureFileName);
         else
             System.err.println("Error loading textue.");
         System.out.println("  Texture height: " + texture.getImageHeight());
@@ -378,9 +511,9 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
         // END: Prepare cube for drawing
     }
 
-    private void initFloor(GL3 gl, float width,float height, float depth, int i) {
+    private void initFloor(GL3 gl, float width, float height, float depth, int i) {
         // BEGIN: Prepare cube for drawing (object 1)
-        float[] color= {1f, 1f, 1f, 1f};
+        float[] color = {1f, 1f, 1f, 1f};
 
         gl.glBindVertexArray(vaoName[i]);
 
@@ -408,21 +541,21 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
         // Defining input for vertex shader
         // Pointer for the vertex shader to the position information per vertex
         gl.glEnableVertexAttribArray(0);
-        gl.glVertexAttribPointer(0, 3, GL.GL_FLOAT, false, 11*4, 0);
+        gl.glVertexAttribPointer(0, 3, GL.GL_FLOAT, false, 11 * 4, 0);
         // Pointer for the vertex shader to the color information per vertex
         gl.glEnableVertexAttribArray(1);
-        gl.glVertexAttribPointer(1, 3, GL.GL_FLOAT, false, 11*4, 3*4);
+        gl.glVertexAttribPointer(1, 3, GL.GL_FLOAT, false, 11 * 4, 3 * 4);
         // Pointer for the vertex shader to the normal information per vertex
         gl.glEnableVertexAttribArray(2);
-        gl.glVertexAttribPointer(2, 3, GL.GL_FLOAT, false, 11*4, 6*4);
+        gl.glVertexAttribPointer(2, 3, GL.GL_FLOAT, false, 11 * 4, 6 * 4);
         // Pointer for the vertex shader to the texture coordinates information per vertex
         gl.glEnableVertexAttribArray(3);
-        gl.glVertexAttribPointer(3, 2, GL.GL_FLOAT, false, 11*4, 9*4);
+        gl.glVertexAttribPointer(3, 2, GL.GL_FLOAT, false, 11 * 4, 9 * 4);
 
         // Metallic material
         float[] matEmission = {0.0f, 0.0f, 0.0f, 1.0f};
-        float[] matAmbient =  {0.4f, 0.4f, 0.4f, 1.0f};
-        float[] matDiffuse =  {0.5f, 0.5f, 0.5f, 1.0f};
+        float[] matAmbient = {0.4f, 0.4f, 0.4f, 1.0f};
+        float[] matDiffuse = {0.5f, 0.5f, 0.5f, 1.0f};
         float[] matSpecular = {0.4f, 0.6f, 0.8f, 1.0f};
         float matShininess = 1.0f;
 
@@ -464,12 +597,9 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
                     .setLoadNormals(true) // tell the loader to also load normal data
                     .loadMesh(Resource.file(skullObj)) // actually load the file
                     .getVertices(); // take the vertices from the loaded mesh
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-        System.out.println("MESH: " + Arrays.toString(skullVertices));
         // Create and activate a vertex array object (VAO)
 
         gl.glBindVertexArray(vaoName[i]);
@@ -494,16 +624,16 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
         // Enable layout position 0
         gl.glEnableVertexAttribArray(0);
         // Map layout position 0 to the position information per vertex in the VBO.
-        gl.glVertexAttribPointer(0, 3, GL.GL_FLOAT, false, 6* Float.BYTES, 0);
+        gl.glVertexAttribPointer(0, 3, GL.GL_FLOAT, false, 6 * Float.BYTES, 0);
         // Enable layout position 1
         gl.glEnableVertexAttribArray(1);
         // Map layout position 1 to the color information per vertex in the VBO.
-        gl.glVertexAttribPointer(1, 3, GL.GL_FLOAT, false, 6* Float.BYTES, 3* Float.BYTES);
+        gl.glVertexAttribPointer(1, 3, GL.GL_FLOAT, false, 6 * Float.BYTES, 3 * Float.BYTES);
 
         // Metallic material
         float[] matEmission = {0.0f, 0.0f, 0.0f, 1.0f};
-        float[] matAmbient =  {0.4f, 0.4f, 0.4f, 1.0f};
-        float[] matDiffuse =  {0.5f, 0.5f, 0.5f, 1.0f};
+        float[] matAmbient = {0.4f, 0.4f, 0.4f, 1.0f};
+        float[] matDiffuse = {0.5f, 0.5f, 0.5f, 1.0f};
         float[] matSpecular = {0.4f, 0.6f, 0.8f, 1.0f};
         float matShininess = 1.0f;
 
@@ -517,8 +647,7 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
                     .setLoadNormals(true) // tell the loader to also load normal data
                     .loadMesh(Resource.file(boneObj)) // actually load the file
                     .getVertices(); // take the vertices from the loaded mesh
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
@@ -547,58 +676,72 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
         // Enable layout position 0
         gl.glEnableVertexAttribArray(0);
         // Map layout position 0 to the position information per vertex in the VBO.
-        gl.glVertexAttribPointer(0, 3, GL.GL_FLOAT, false, 6* Float.BYTES, 0);
+        gl.glVertexAttribPointer(0, 3, GL.GL_FLOAT, false, 6 * Float.BYTES, 0);
         // Enable layout position 1
         gl.glEnableVertexAttribArray(1);
         // Map layout position 1 to the color information per vertex in the VBO.
-        gl.glVertexAttribPointer(1, 3, GL.GL_FLOAT, false, 6* Float.BYTES, 3* Float.BYTES);
+        gl.glVertexAttribPointer(1, 3, GL.GL_FLOAT, false, 6 * Float.BYTES, 3 * Float.BYTES);
 
         // Metallic material
         float[] matEmission = {0.0f, 0.0f, 0.0f, 1.0f};
-        float[] matAmbient =  {0.4f, 0.4f, 0.4f, 1.0f};
-        float[] matDiffuse =  {0.5f, 0.5f, 0.5f, 1.0f};
+        float[] matAmbient = {0.4f, 0.4f, 0.4f, 1.0f};
+        float[] matDiffuse = {0.5f, 0.5f, 0.5f, 1.0f};
         float[] matSpecular = {0.4f, 0.6f, 0.8f, 1.0f};
         float matShininess = 1.0f;
 
         material0 = new Material(matEmission, matAmbient, matDiffuse, matSpecular, matShininess);
     }
 
+    public void drawCurve(GL2 gl, ArrayList<StopPoint> curvePoints) {
 
+        gl.glEnable(GL_MAP1_VERTEX_3);
+
+        gl.glPointSize(20f);
+        gl.glColor3f(1f, 1f, 1f);
+        gl.glBegin(GL_POINTS);
+        for (StopPoint curvePoint : curvePoints) {
+            gl.glVertex3f(curvePoint.getPos()[0], curvePoint.getPos()[1], curvePoint.getPos()[2]);
+        }
+
+        gl.glEnd();
+    }
 
 
     /**
      * Implementation of the OpenGL EventListener (GLEventListener) method
      * called by the OpenGL animator for every frame.
+     *
      * @param drawable The OpenGL drawable
      */
     @Override
     public void display(GLAutoDrawable drawable) {
         GL3 gl = drawable.getGL().getGL3();
+        GL2 gl2 = drawable.getGL().getGL2();
         gl.glClear(GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT);
 
         // Background color of the canvas
         gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-        // For monitoring the interaction settings
-/*        System.out.println("Camera: z = " + interactionHandler.getEyeZ() + ", " +
-                "x-Rot: " + interactionHandler.getAngleXaxis() +
-                ", y-Rot: " + interactionHandler.getAngleYaxis() +
-                ", x-Translation: " + interactionHandler.getxPosition()+
-                ", y-Translation: " + interactionHandler.getyPosition());// definition of translation of model (Model/Object Coordinates --> World Coordinates)
-*/
         // Using the PMV-Tool for geometric transforms
         pmvMatrix.glMatrixMode(PMVMatrix.GL_MODELVIEW);
         pmvMatrix.glLoadIdentity();
+
         // Setting the camera position, based on user input
-        pmvMatrix.gluLookAt(0f, 200f, 0,
-                0f, 0f, 0f,
-                0f, 0f, -1f);
-        pmvMatrix.glTranslatef(interactionHandler.getxPosition(), interactionHandler.getyPosition(), 0f);
+        pmvMatrix.gluLookAt(player.getPositionX(), player.getPositionY(), player.getPositionZ(),
+                player.getFocusX(), player.getFocusY(), player.getFocusZ(),
+                0f, 1f, 0f);
         pmvMatrix.glRotatef(interactionHandler.getAngleXaxis(), 1f, 0f, 0f);
         pmvMatrix.glRotatef(interactionHandler.getAngleYaxis(), 0f, 1f, 0f);
 
+        /*pmvMatrix.gluLookAt(0f, 0f, 600f,
+                0f, 0f, 0f,
+                0f, 1.0f, 0f);
+        pmvMatrix.glTranslatef(interactionHandler.getxPosition(), interactionHandler.getyPosition(), 0f);
+        pmvMatrix.glRotatef(interactionHandler.getAngleXaxis(), 1f, 0f, 0f);
+        pmvMatrix.glRotatef(interactionHandler.getAngleYaxis(), 0f, 1f, 0f);*/
+
         //Place all walls
-        for(int i = 0; i < noOfWalls; i++) {
+        for (int i = 0; i < noOfWalls; i++) {
             pmvMatrix.glPushMatrix();
             pmvMatrix.glTranslatef(wallPos[i * 3], wallPos[i * 3 + 1], wallPos[i * 3 + 2]);
             displayObject(gl, i);
@@ -626,7 +769,110 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
 
         // Use the vertices in the VBO to draw a triangle.
         gl.glDrawArrays(GL.GL_TRIANGLES, 0, skullVertices.length);
+        drawCurve(gl2, curvePoints);
         //gl.glDrawArrays(GL.GL_TRIANGLES, 0, boneVertices.length);
+    }
+
+    public void move(int curveIndex) {
+        float[] newPos = new float[3];
+        newPos[0] = curvePoints.get(curveIndex).getPos()[0] * 10;
+        newPos[1] = curvePoints.get(curveIndex).getPos()[1];
+        newPos[2] = curvePoints.get(curveIndex).getPos()[2] * 10;
+        Timer t = new Timer();
+        t.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                player.setPosition(moveBetweenPoints(player.getPosition(), newPos, player.getPosition()));
+                player.setFocus(moveBetweenPoints(player.getPosition(), newPos, player.getFocus()));
+                System.out.println(Arrays.toString(player.getFocus()));
+                if (Arrays.equals(player.getPosition(), newPos)) {
+                    System.out.println("Ich habs geschafft!");
+                    t.purge();
+                    t.cancel();
+                    player.setPositionIndex(curveIndex);
+                }
+            }
+        }, 0, 8);
+    }
+
+    public void rotate(float deg) {
+        if (!focusSet) {
+            System.out.println("focus has been reset");
+            nextFocus = changeFocusPoint(player.getPosition(), player.getFocus(), deg);
+            focusSet = true;
+        }
+        Timer t = new Timer();
+        t.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                player.setFocus(rotateBetweenPoints(player.getFocus(), nextFocus));
+                if (Arrays.equals(player.getFocus(), nextFocus)) {
+                    focusSet = false;
+                    t.purge();
+                    t.cancel();
+                    player.setAngle(player.getAngle() + deg);
+                    if (player.getAngle() < 0) {
+                        player.setAngle(270);
+                    } else if (player.getAngle() >= 360) {
+                        player.setAngle(0);
+                    }
+                    System.out.println("Angle: " + player.getAngle());
+                }
+            }
+        }, 0, 5);
+    }
+
+    private float[] changeFocusPoint(float[] pos, float[] focus, float deg) {
+
+        //Help vector in 0/0/0
+        float[] vector = new float[3];
+        for (int i = 0; i < focus.length; i++) {
+            vector[i] = focus[i] - pos[i];
+        }
+
+        //Convert degree to radiant
+        deg = (float) Math.toRadians(deg);
+
+        //Rotation applied via matrix
+        focus[0] = (float) (cos(deg) * vector[0] + sin(deg) * vector[2] + pos[0]);
+        focus[2] = (float) (-sin(deg) * vector[0] + cos(deg) * vector[2] + pos[2]);
+
+        //Return new focus point
+        return focus;
+    }
+
+    private float[] moveBetweenPoints(float[] pos1, float[] pos2, float[] applyTo) {
+
+
+        // transition x and z value, keep y
+        for (int i = 0; i < 2; i++) {
+            int j = i * 2;
+            if (pos1[j] < pos2[j]) {
+                applyTo[j]++;
+            } else if (pos1[j] - 1 > pos2[j]) {
+                applyTo[j]--;
+            } else {
+                applyTo[j] = applyTo[j] + pos2[j] - pos1[j];
+            }
+        }
+
+        return applyTo;
+    }
+
+    private float[] rotateBetweenPoints(float[] pos1, float[] pos2) {
+        // transition x and z value, keep y
+        for (int i = 0; i < 2; i++) {
+            int j = i * 2;
+            if (pos1[j] < pos2[j]) {
+                pos1[j]++;
+            } else if (pos1[j] - 1 > pos2[j]) {
+                pos1[j]--;
+            } else {
+                pos1[j] = pos2[j];
+            }
+        }
+
+        return pos1;
     }
 
     private void displayObject(GL3 gl, int i) {
@@ -680,10 +926,10 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
     }
 
 
-
     /**
      * Implementation of the OpenGL EventListener (GLEventListener) method
      * called when the OpenGL window is resized.
+     *
      * @param drawable The OpenGL drawable
      * @param x
      * @param y
@@ -698,12 +944,13 @@ public class BoxLightTexRendererPP extends GLCanvas implements GLEventListener {
 
         pmvMatrix.glMatrixMode(PMVMatrix.GL_PROJECTION);
         pmvMatrix.glLoadIdentity();
-        pmvMatrix.gluPerspective(45f, (float) width/ (float) height, 0.01f, 10000f);
+        pmvMatrix.gluPerspective(45f, (float) width / (float) height, 0.01f, 10000f);
     }
 
     /**
      * Implementation of the OpenGL EventListener (GLEventListener) method
      * called when OpenGL canvas ist destroyed.
+     *
      * @param drawable
      */
     @Override

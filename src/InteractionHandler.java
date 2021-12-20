@@ -157,7 +157,9 @@ public class InteractionHandler implements KeyListener, MouseListener, MouseMoti
                 if (ctrlKeyPressed) {
                     xPosition -= xPositionInc;
                 } else {
-                    angleYaxis -= angleYaxisInc;
+                    //angleYaxis -= angleYaxisInc;
+
+
                 }
                 break;
             case KeyEvent.VK_UP:
