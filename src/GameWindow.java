@@ -57,7 +57,7 @@ import java.io.IOException;
  * @version 26.8.2015, 16.9.2015, 10.9.2017, 17.9.2018, 19.9.2018, 27.10.2021
  *
  */
-public class GameWindow extends JFrame {
+public class GameWindow {
 
     private static final long serialVersionUID = 1L;
     private static String FRAME_TITLE = "Start Code Main Window - Fixed Function Pipeline with Menu";
@@ -73,11 +73,13 @@ public class GameWindow extends JFrame {
     public static JLabel noCameraText = null;
     Labyrinth canvas;
     Player player;
+    JSplitPane splitPane;
+    FPSAnimator animator;
 
     /**
      * Standard constructor generating a Java Swing window for displaying an OpenGL canvas.
      */
-    public GameWindow() {
+    public GameWindow(JFrame frame) {
         // Setup an OpenGL context for the GLCanvas
         // Using the JOGL-Profile GL2
         // GL2: Compatibility profile, OpenGL Versions 1.0 to 3.0
@@ -87,18 +89,17 @@ public class GameWindow extends JFrame {
         // Create the OpenGL Canvas for rendering content
         canvas = new Labyrinth(capabilities);
         player = canvas.player;
-        //canvas.setPreferredSize(new Dimension(GLCANVAS_WIDTH, GLCANVAS_HEIGHT));
-        //canvas.setSize(new Dimension(GLCANVAS_WIDTH, GLCANVAS_HEIGHT));
 
         // Create an animator object for calling the display method of the GLCanvas
         // at the defined frame rate.
-        final FPSAnimator animator = new FPSAnimator(canvas, FRAME_RATE, true);
+        animator = new FPSAnimator(canvas, FRAME_RATE, true);
 
-        // Create the window container
-        this.setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
 
         // Create and add split pane to window
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+
+        splitPane.setPreferredSize(frame.getSize());
+        splitPane.setSize(frame.getSize());
         splitPane.setDividerLocation(500);
         splitPane.setEnabled(false);
 
@@ -132,38 +133,15 @@ public class GameWindow extends JFrame {
         menuPanel.add(btnRight);
 
         // Create and add glpanel to right side of split pane
-        JPanel glPanel = new JPanel();
-        splitPane.setRightComponent(glPanel);
-        glPanel.add(canvas);
+        JPanel canvasPanel = new JPanel();
+        splitPane.setRightComponent(canvasPanel);
+        canvasPanel.add(canvas);
+        canvas.setPreferredSize(new Dimension(GLCANVAS_WIDTH, GLCANVAS_HEIGHT));
 
         createCameraView(menuPanel);
 
-        // Add split pane to window
-        this.getContentPane().add(splitPane);
-
-        this.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                // Thread to stop the animator
-                // before the program exits
-                new Thread() {
-                    @Override
-                    public void run() {
-                        if (animator.isStarted()) animator.stop();
-                        System.exit(0);
-                    }
-                }.start();
-            }
-        });
-        this.setResizable(true);
-        this.setTitle(FRAME_TITLE);
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.pack();
-        this.setVisible(true);
-        animator.start();
-
         // Set canvas size to size of glpanel
-        canvas.setSize(glPanel.getSize());
+        canvas.setSize(canvasPanel.getSize());
 
         // OpenGL: request focus for canvas
         canvas.requestFocusInWindow();
@@ -188,22 +166,5 @@ public class GameWindow extends JFrame {
 
            menuPanel.add(noCameraText);
         }
-    }
-
-    /**
-     * Creates the main window and starts the program
-     * @param args The arguments are not used
-     */
-    public static void main(String[] args) throws IOException {
-        // Ensure thread safety
-        SwingUtilities.invokeLater(new Runnable() {
-                                       @Override
-                                       public void run() {
-                                           new GameWindow();
-
-                                       }
-                                   }
-        );
-
     }
 }
