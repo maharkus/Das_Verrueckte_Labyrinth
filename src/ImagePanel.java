@@ -1,7 +1,4 @@
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.LayoutManager;
+import java.awt.*;
 import java.awt.image.ImageObserver;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
@@ -10,7 +7,9 @@ class ImagePanel extends JPanel {
     private Image img;
 
     public ImagePanel(String img) {
+
         this((new ImageIcon(img)).getImage());
+
     }
 
     public ImagePanel(Image img) {
