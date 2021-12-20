@@ -39,7 +39,6 @@ import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.util.FPSAnimator;
 
 import java.io.IOException;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Container class of the graphics application.
@@ -58,7 +57,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @version 26.8.2015, 16.9.2015, 10.9.2017, 17.9.2018, 19.9.2018, 27.10.2021
  *
  */
-public class BoxLightTexMainWindowPP extends JFrame {
+public class GameWindow extends JFrame {
 
     private static final long serialVersionUID = 1L;
     private static String FRAME_TITLE = "Start Code Main Window - Fixed Function Pipeline with Menu";
@@ -78,7 +77,7 @@ public class BoxLightTexMainWindowPP extends JFrame {
     /**
      * Standard constructor generating a Java Swing window for displaying an OpenGL canvas.
      */
-    public BoxLightTexMainWindowPP() {
+    public GameWindow() {
         // Setup an OpenGL context for the GLCanvas
         // Using the JOGL-Profile GL2
         // GL2: Compatibility profile, OpenGL Versions 1.0 to 3.0
@@ -200,7 +199,7 @@ public class BoxLightTexMainWindowPP extends JFrame {
         SwingUtilities.invokeLater(new Runnable() {
                                        @Override
                                        public void run() {
-                                           new BoxLightTexMainWindowPP();
+                                           new GameWindow();
 
                                        }
                                    }
