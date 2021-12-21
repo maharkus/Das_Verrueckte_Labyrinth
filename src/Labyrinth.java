@@ -759,12 +759,25 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
             }
         }, 0, 8);
 
-        if (curveIndex == 25) {
-            new EndGame();
+        if (curveIndex == 0) {
+            File welcome = new File("resources/sounds/welcome.wav");
+            new PlaySound(welcome,0);
         }
-        if (curveIndex == 2) {
+        else if (curveIndex == 3 || curveIndex == 10 || curveIndex == 14 || curveIndex == 23) {
+            File welcome = new File("resources/sounds/sackgasse.wav");
+            new PlaySound(welcome,0);
+        }
+        else if (curveIndex == 2) {
             File spookySound = new File("resources/sounds/spookyWav.wav");
-            new PlaySound(spookySound);
+            new PlaySound(spookySound,0);
+        }
+        else if (curveIndex == 25) {
+            new EndGame();
+            File spookySound = new File("resources/sounds/dootDoot.wav");
+            new PlaySound(spookySound, 0f);
+        }
+        else if (Math.random() < 1) {
+            new PlaySound(new RandomSound().getRandomFile(),-20);
         }
 
     }

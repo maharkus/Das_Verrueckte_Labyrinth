@@ -45,6 +45,7 @@ public class MainMenu extends JFrame{
         panel.add(header);
         panel.add(StartButton("START", 50, 200, this));
         panel.add(ExitButton("EXIT", 50, 100));
+
         this.setTitle("Das Verrückkte Labyrinth");
         this.setSize(1920, 1080);
         this.setLocationRelativeTo((Component)null);
@@ -121,5 +122,7 @@ public class MainMenu extends JFrame{
 
     public static void main(String[] args) {
         new MainMenu();
+        File background = new File("resources/sounds/backgroundMusic.wav");
+        new PlayMusic(background,-20);
     }
 }
