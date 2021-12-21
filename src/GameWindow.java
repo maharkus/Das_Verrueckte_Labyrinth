@@ -1,6 +1,7 @@
 import java.awt.*;
 
 import javax.swing.*;
+import javax.swing.plaf.basic.BasicSplitPaneDivider;
 
 import com.github.sarxos.webcam.Webcam;
 import com.jogamp.opengl.GLCapabilities;
@@ -10,12 +11,6 @@ import com.sun.tools.javac.Main;
 
 
 public class GameWindow {
-
-    private static final long serialVersionUID = 1L;
-    private static String FRAME_TITLE = "Start Code Main Window - Fixed Function Pipeline with Menu";
-
-    private static final int WINDOW_WIDTH = 1920;
-    private static final int WINDOW_HEIGHT = 1080;
 
     // width of the canvas
     private static final int GLCANVAS_WIDTH = 640;
@@ -47,6 +42,10 @@ public class GameWindow {
 
         // Create and add split pane to window
         splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+
+        //splitPane.setBorder(null);
+        splitPane.setDividerSize(1);
+
         splitPane.setPreferredSize(frame.getSize());
         splitPane.setSize(frame.getSize());
         splitPane.setDividerLocation(500);
@@ -55,46 +54,66 @@ public class GameWindow {
         // Create and add menu panel to left side of split pane
         JPanel menuPanel = new JPanel();
         splitPane.setLeftComponent(menuPanel);
-        GridBagLayout menuGrid = new GridBagLayout();
-        GridBagConstraints c = new GridBagConstraints();
-        menuPanel.setLayout(menuGrid);
+//        GridBagLayout menuGrid = new GridBagLayout();
+//        GridBagConstraints c = new GridBagConstraints();
+//        menuPanel.setLayout(menuGrid);
+
+        menuPanel.setBackground(Color.BLACK);
         menuPanel.setSize(500, splitPane.getHeight());
 
+        GridLayout grid = new GridLayout(4,1, 0,32);
+        menuPanel.setLayout(grid);
+        menuPanel.setBorder(BorderFactory.createEmptyBorder(150, 50, 0, 50));
+
+
+
         JButton btnForward = new JButton("Vorwärts");
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.ipady = 40;
-        c.weightx = 3;
-        c.gridwidth = 3;
-        c.gridx = 0;
-        c.gridy = 0;
+        btnForward.setBackground(new Color(102, 0, 153));
+        btnForward.setForeground(Color.WHITE);
+        btnForward.setFont(new Font("Arial", Font.BOLD, 52));
+        //btnForward.setBorder(BorderFactory.createEmptyBorder(32, 64, 32, 64));
+        btnForward.setFocusPainted(false);
+        btnForward.setOpaque(true);
+        btnForward.setBorderPainted(false);
+
         btnForward.addActionListener(e -> {
             canvas.move(canvas.curvePoints.get(canvas.player.getPositionIndex()).getDirections()[(int) (canvas.player.getAngle()/90)]);
         });
-        btnForward.setSize(100, 50);
+        menuPanel.add(btnForward);
 
-        menuPanel.add(btnForward, c);
+
 
         JButton btnLeft = new JButton("Links");
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.weightx = 0.5;
-        c.gridx = 1;
-        c.gridy =55;
+        btnLeft.setBackground(new Color(102, 0, 153));
+        btnLeft.setForeground(Color.WHITE);
+        btnLeft.setFont(new Font("Arial", Font.BOLD, 52));
+        //btnLeft.setBorder(BorderFactory.createEmptyBorder(32, 115, 32, 115));
+        btnLeft.setFocusPainted(false);
+        btnLeft.setOpaque(true);
+        btnLeft.setBorderPainted(false);
+
         btnLeft.addActionListener(e -> {
             canvas.rotate(90f);
         });
-        btnLeft.setSize(100, 50);
         menuPanel.add(btnLeft);
 
+
+
         JButton btnRight = new JButton("Rechts");
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.weightx = 0.5;
-        c.gridx = 1;
-        c.gridy = 1;
+        btnRight.setBackground(new Color(102, 0, 153));
+        btnRight.setForeground(Color.WHITE);
+        btnRight.setFont(new Font("Arial", Font.BOLD, 52));
+        //btnRight.setBorder(BorderFactory.createEmptyBorder(32, 94, 32, 94));
+        btnRight.setFocusPainted(false);
+        btnRight.setOpaque(true);
+        btnRight.setBorderPainted(false);
+
         btnRight.addActionListener(e -> {
             canvas.rotate(-90f);
         });
-        btnRight.setSize(100, 50);
         menuPanel.add(btnRight);
+
+
 
         // Create and add glpanel to right side of split pane / Game Content
         JPanel canvasPanel = new JPanel();

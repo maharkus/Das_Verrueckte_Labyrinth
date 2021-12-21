@@ -65,6 +65,8 @@ public class MainMenu extends JFrame{
 
         button.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
+            }
+            public void mouseReleased(MouseEvent e) {
                 button.setBackground(Color.BLACK);
                 button.setBackground(new Color(102, 0, 153));
                 frame.getContentPane().removeAll();
@@ -108,8 +110,6 @@ public class MainMenu extends JFrame{
                                 }),
                         3000
                 );
-            }
-            public void mouseReleased(MouseEvent e) {
             }
         });
         return button;
