@@ -97,7 +97,6 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         right, up, left, down, stay
     }
 
-    private int noOfObjects;
     private int noOfWalls;
     private float[] wallPos;
     ArrayList<StopPoint> curvePoints = new ArrayList<>();
@@ -114,7 +113,6 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
     private float[] torch180Vertices;
     private float[] boneVertices;
     private float[] pumpkinVertices;
-
 
     public Labyrinth() {
         // Create the canvas with default capabilities
@@ -337,7 +335,7 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
 
         // BEGIN: Allocating vertex array objects and buffers for each object
         noOfWalls = wallSizes.length / 3;
-        noOfObjects = noOfWalls + 2;
+        int noOfObjects = noOfWalls + 2;
         // create vertex array objects for noOfObjects objects (VAO)
         vaoName = new int[noOfObjects];
         gl.glGenVertexArrays(noOfObjects, vaoName, 0);
@@ -416,6 +414,7 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         // Start parameter settings for the interaction handler might be called here
         interactionHandler.setEyeZ(2);
         // END: Preparing scene
+
     }
 
     private void initObject(GL3 gl, float width, float height, float depth, int i) {
@@ -737,7 +736,6 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         gl.glUniformMatrix4fv(1, 1, false, pmvMatrix.glGetMvMatrixf());
 
         drawCurve(gl2, curvePoints);
-        //gl.glDrawArrays(GL.GL_TRIANGLES, 0, boneVertices.length);
     }
 
     public void move(int curveIndex) {
