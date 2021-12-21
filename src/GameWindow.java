@@ -176,8 +176,7 @@ public class GameWindow {
                System.out.println("Attempt to find camera again");
                createCameraView(menuPanel);
            });
-
-
+           
            menuPanel.add(noCameraText);
         }
     }

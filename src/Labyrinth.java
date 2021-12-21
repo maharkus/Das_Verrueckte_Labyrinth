@@ -754,6 +754,8 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
                 }
             }
         }, 0, 8);
+
+
     }
 
     public void rotate(float deg) {
