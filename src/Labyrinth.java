@@ -653,6 +653,7 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         pmvMatrix.glRotatef(interactionHandler.getAngleXaxis(), 1f, 0f, 0f);
         pmvMatrix.glRotatef(interactionHandler.getAngleYaxis(), 0f, 1f, 0f);
 
+        // Camera for debugging
         /*pmvMatrix.gluLookAt(0f, 0f, 600f,
                 0f, 0f, 0f,
                 0f, 1.0f, 0f);
@@ -673,9 +674,6 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         pmvMatrix.glTranslatef(0, -25, 0);
         displayObject(gl, 21);
         pmvMatrix.glPopMatrix();
-
-
-
 
         //display blender .obj
         displayBigSkull(gl2, -184f, 30, 178);
@@ -737,6 +735,8 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
 
         drawCurve(gl2, curvePoints);
     }
+
+    //Player Movements
 
     public void move(int curveIndex) {
 
@@ -846,6 +846,8 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
 
         return pos1;
     }
+
+    //Display methods
 
     private void displayObject(GL3 gl, int i) {
         // BEGIN: Draw the second object (object 1)
