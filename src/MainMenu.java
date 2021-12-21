@@ -5,11 +5,9 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
+import java.util.Timer;
+import java.util.TimerTask;
+import javax.swing.*;
 
 public class MainMenu extends JFrame{
 
@@ -67,12 +65,13 @@ public class MainMenu extends JFrame{
         button.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
                 button.setBackground(Color.BLACK);
-            }
-            public void mouseReleased(MouseEvent e) {
                 button.setBackground(new Color(102, 0, 153));
                 frame.getContentPane().removeAll();
                 frame.repaint();
-
+                JPanel loadingScreen = new JPanel();
+                loadingScreen.setBackground(new Color(0, 0,0, 255));
+                loadingScreen.setSize(frame.getSize());
+                frame.add(loadingScreen);
                 GameWindow game = new GameWindow(frame);
                 frame.add(game.splitPane);
                 frame.setVisible(true);
@@ -85,12 +84,31 @@ public class MainMenu extends JFrame{
                         new Thread() {
                             @Override
                             public void run() {
-                                if (game.animator.isStarted()) game.animator.stop();
+                                if (game.animator.isStarted()) {
+                                    game.animator.stop();
+                                }
                                 System.exit(0);
                             }
                         }.start();
                     }
                 });
+
+
+                java.util.Timer t = new Timer();
+                t.schedule((
+                                new java.util.TimerTask() {
+                                    @Override
+                                    public void run() {
+
+                                        loadingScreen.setVisible(false);
+                                        t.purge();
+                                        t.cancel();
+                                    }
+                                }),
+                        3000
+                );
+            }
+            public void mouseReleased(MouseEvent e) {
             }
         });
         return button;
