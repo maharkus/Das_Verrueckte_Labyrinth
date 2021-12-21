@@ -49,7 +49,7 @@ public class EndGame {
         frame.add(panel);
         panel.add(header);
         panel.add(text);
-        panel.add(EndButton("EXIT GAME", 30, 75));
+        panel.add(EndButton("EXIT GAME", 300, 75));
         frame.setTitle("Das Verrückkte Labyrinth");
         frame.setSize(700, 400);
         frame.setResizable(false);
