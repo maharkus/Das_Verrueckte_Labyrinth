@@ -755,6 +755,9 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
             }
         }, 0, 8);
 
+        if (curveIndex == 25) {
+            new EndGame();
+        }
 
     }
 

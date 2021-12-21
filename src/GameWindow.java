@@ -1,35 +1,4 @@
-/**
- * Copyright 2012-2013 JogAmp Community. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are
- * permitted provided that the following conditions are met:
- *
- *    1. Redistributions of source code must retain the above copyright notice, this list of
- *       conditions and the following disclaimer.
- *
- *    2. Redistributions in binary form must reproduce the above copyright notice, this list
- *       of conditions and the following disclaimer in the documentation and/or other materials
- *       provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY JogAmp Community ``AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL JogAmp Community OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * The views and conclusions contained in the software and documentation are those of the
- * authors and should not be interpreted as representing official policies, either expressed
- * or implied, of JogAmp Community.
- */
-
-
 import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
 import javax.swing.*;
 
@@ -38,25 +7,7 @@ import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.util.FPSAnimator;
 
-import java.io.IOException;
 
-/**
- * Container class of the graphics application.
- * Creates a Window (JFrame) where the OpenGL canvas is displayed in.
- * Starts an animation loop, which triggers the renderer.
- *
- * Displays a triangle using the fixed function pipeline.
- *
- * Based on a tutorial by Chua Hock-Chuan
- * http://www3.ntu.edu.sg/home/ehchua/programming/opengl/JOGL2.0.html
- *
- * and on an example by Xerxes Rånby
- * http://jogamp.org/git/?p=jogl-demos.git;a=blob;f=src/demos/es2/RawGL2ES2demo.java;hb=HEAD
- *
- * @author Karsten Lehn, Darius Schippritt (changes since 2021)
- * @version 26.8.2015, 16.9.2015, 10.9.2017, 17.9.2018, 19.9.2018, 27.10.2021
- *
- */
 public class GameWindow {
 
     private static final long serialVersionUID = 1L;
@@ -152,6 +103,8 @@ public class GameWindow {
         JPanel canvasPanel = new JPanel();
         splitPane.setRightComponent(canvasPanel);
         canvasPanel.add(canvas);
+        GridLayout gridLayout = new GridLayout(1, 1);
+        canvasPanel.setLayout(gridLayout);
         canvas.setPreferredSize(new Dimension(GLCANVAS_WIDTH, GLCANVAS_HEIGHT));
 
         createCameraView(menuPanel);
