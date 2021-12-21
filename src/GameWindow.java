@@ -16,9 +16,13 @@ public class GameWindow {
     private static final int WINDOW_WIDTH = 1920;
     private static final int WINDOW_HEIGHT = 1080;
 
-    private static final int GLCANVAS_WIDTH = 640;  // width of the canvas
-    private static final int GLCANVAS_HEIGHT = 480; // height of the canvas
-    private static final int FRAME_RATE = 60; // target frames per seconds
+    // width of the canvas
+    private static final int GLCANVAS_WIDTH = 640;
+    // height of the canvas
+    private static final int GLCANVAS_HEIGHT = 480;
+    // target frames per seconds
+    private static final int FRAME_RATE = 60;
+
 
     public static JButton button = null;
     public static JLabel noCameraText = null;
@@ -27,13 +31,8 @@ public class GameWindow {
     JSplitPane splitPane;
     FPSAnimator animator;
 
-    /**
-     * Standard constructor generating a Java Swing window for displaying an OpenGL canvas.
-     */
     public GameWindow(JFrame frame) {
-        // Setup an OpenGL context for the GLCanvas
-        // Using the JOGL-Profile GL2
-        // GL2: Compatibility profile, OpenGL Versions 1.0 to 3.0
+
         GLProfile profile = GLProfile.get(GLProfile.GL2);
         GLCapabilities capabilities = new GLCapabilities(profile);
 
@@ -45,10 +44,8 @@ public class GameWindow {
         // at the defined frame rate.
         animator = new FPSAnimator(canvas, FRAME_RATE, true);
 
-
         // Create and add split pane to window
         splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-
         splitPane.setPreferredSize(frame.getSize());
         splitPane.setSize(frame.getSize());
         splitPane.setDividerLocation(500);
@@ -87,7 +84,6 @@ public class GameWindow {
         btnLeft.setSize(100, 50);
         menuPanel.add(btnLeft);
 
-
         JButton btnRight = new JButton("Rechts");
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 0.5;
@@ -99,7 +95,7 @@ public class GameWindow {
         btnRight.setSize(100, 50);
         menuPanel.add(btnRight);
 
-        // Create and add glpanel to right side of split pane
+        // Create and add glpanel to right side of split pane / Game Content
         JPanel canvasPanel = new JPanel();
         splitPane.setRightComponent(canvasPanel);
         canvasPanel.add(canvas);

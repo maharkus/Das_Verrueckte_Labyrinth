@@ -4,25 +4,23 @@ import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
 class ImagePanel extends JPanel {
-    private Image img;
+    private Image image;
 
-    public ImagePanel(String img) {
-
-        this((new ImageIcon(img)).getImage());
-
+    public ImagePanel(String image) {
+        this((new ImageIcon(image)).getImage());
     }
 
-    public ImagePanel(Image img) {
-        this.img = img;
-        Dimension size = new Dimension(img.getWidth((ImageObserver)null), img.getHeight((ImageObserver)null));
-        this.setPreferredSize(size);
-        this.setMinimumSize(size);
-        this.setMaximumSize(size);
-        this.setSize(size);
+    public ImagePanel(Image image) {
+        this.image = image;
+        Dimension imageSize = new Dimension(image.getWidth((ImageObserver)null), image.getHeight((ImageObserver)null));
+        this.setPreferredSize(imageSize);
+        this.setMinimumSize(imageSize);
+        this.setMaximumSize(imageSize);
+        this.setSize(imageSize);
         this.setLayout((LayoutManager)null);
     }
 
     public void paintComponent(Graphics g) {
-        g.drawImage(this.img, 0, 0, (ImageObserver)null);
+        g.drawImage(this.image, 0, 0, (ImageObserver)null);
     }
 }

@@ -42,6 +42,10 @@ import com.jogamp.opengl.util.texture.TextureIO;
 import de.hshl.obj.loader.OBJLoader;
 import de.hshl.obj.loader.Resource;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+
 import static com.jogamp.opengl.GL.*;
 import static com.jogamp.opengl.GL2.GL_MAP1_VERTEX_3;
 import static com.jogamp.opengl.math.FloatUtil.cos;
@@ -757,6 +761,21 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
 
         if (curveIndex == 25) {
             new EndGame();
+        }
+        if (curveIndex == 2) {
+            File spookySound = new File("resources/sounds/spookyWav.wav");
+            PlaySound(spookySound);
+        }
+
+    }
+
+    static void PlaySound(File Sound) {
+        try {
+            Clip sound = AudioSystem.getClip();
+            sound.open(AudioSystem.getAudioInputStream(Sound));
+            sound.start();
+        } catch (Exception e) {
+
         }
 
     }

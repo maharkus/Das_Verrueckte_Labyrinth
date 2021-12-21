@@ -18,7 +18,7 @@ public class MainMenu extends JFrame{
     public Font spookyFont() {
         try {
             spookyFont = Font.createFont(Font.TRUETYPE_FONT, new File
-                    ("resources/fonts/StrangerCreature-MVpBr.ttf")).deriveFont(80f);
+                    ("resources/fonts/StrangerCreature-MVpBr.ttf"));
             GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
             ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File
                     ("resources/fonts/StrangerCreature-MVpBr.ttf")));
@@ -34,7 +34,7 @@ public class MainMenu extends JFrame{
         ImagePanel panel = new ImagePanel((new ImageIcon("resources/laby.jpg")).getImage());
 
         JLabel header = new JLabel("Das Verrückte Labyrinth", 0);
-        header.setFont(spookyFont());
+        header.setFont(spookyFont().deriveFont(80f));
         header.setForeground(Color.WHITE);
         panel.setBorder(BorderFactory.createEmptyBorder(300, 500, 200, 500));
         panel.setBackground(Color.BLACK);
@@ -58,8 +58,9 @@ public class MainMenu extends JFrame{
         button.setPreferredSize(new Dimension(width, height));
         button.setForeground(Color.WHITE);
         button.setBackground(new Color(102, 0, 153));
-        button.setFont(spookyFont);
+        button.setFont(spookyFont.deriveFont(50f));
         button.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        button.setFocusPainted(false);
         button.setOpaque(true);
         button.setBorderPainted(false);
 
@@ -101,8 +102,9 @@ public class MainMenu extends JFrame{
         button.setPreferredSize(new Dimension(width, height));
         button.setForeground(Color.WHITE);
         button.setBackground(new Color(0, 0, 0));
-        button.setFont(spookyFont);
+        button.setFont(spookyFont.deriveFont(50f));
         button.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        button.setFocusPainted(false);
         button.setOpaque(true);
         button.setBorderPainted(false);
         button.addMouseListener(new MouseAdapter() {
