@@ -64,7 +64,7 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
 
     // taking texture files from relative path
     private final String texturePath = ".\\resources\\";
-    final String textureFileName = "wall3.jpg";
+    final String textureFileName = "rock_texture.jpg";
 
     private ShaderProgram shaderProgram0;
     private ShaderProgram shaderProgram;
