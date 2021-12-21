@@ -11,7 +11,7 @@ import java.awt.event.ActionListener;
 
 public class MenuEventHandler implements ActionListener {
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == BoxLightTexMainWindowPP.button) {
+        if (e.getSource() == GameWindow.button) {
             // Handle event
         }
     }
