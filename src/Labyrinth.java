@@ -762,21 +762,11 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         }
         if (curveIndex == 2) {
             File spookySound = new File("resources/sounds/spookyWav.wav");
-            PlaySound(spookySound);
+            new PlaySound(spookySound);
         }
 
     }
 
-    static void PlaySound(File Sound) {
-        try {
-            Clip sound = AudioSystem.getClip();
-            sound.open(AudioSystem.getAudioInputStream(Sound));
-            sound.start();
-        } catch (Exception e) {
-
-        }
-
-    }
 
     public void rotate(float deg) {
         if (!focusSet) {
