@@ -163,30 +163,15 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         lightLab = new LightSource(lightPosition, lightAmbientColor,
                 lightDiffuseColor, lightSpecularColor);
 
-        float[] matEmission = {0, 0, 0, 1f};
-        float[] matAmbient = {0.53333f, 0.11765f, 0.59412f, 1};
-        float[] matDiffuse = {0.8f, 0.0f, 0.0f, 1.0f};
-        float[] matSpecular = {0.8f, 0.8f, 0.8f, 1.0f};
-        float matShininess = 10.0f;
-        materialLab = new Material(matEmission, matAmbient,
-                matDiffuse, matSpecular, matShininess);
-
 
         // Light of Torches
-        float[] lightPositionT = {0.0f, 0f, 0f, 1f};
-        float[] lightAmbientColorT = {1, 0, 0, .5f};
-        float[] lightDiffuseColorT = {1, 0, 0, .5f};
-        float[] lightSpecularColorT = {1f, 0, 0f, .5f};
+        float[] lightPositionT = {0.0f, 0f, 0f, .5f};
+        float[] lightAmbientColorT = {1, 0, 0, .2f};
+        float[] lightDiffuseColorT = {1, 0, 0, .25f};
+        float[] lightSpecularColorT = {1f, 0, 0f, .25f};
         lightTorch = new LightSource(lightPositionT, lightAmbientColorT,
                 lightDiffuseColorT, lightSpecularColorT);
 
-        float[] matEmissionT = {0.5f, 0.5f, 0.5f, 1.0f};
-        float[] matAmbientT = {0.5f, 0.5f, 0.5f, 1.0f};
-        float[] matDiffuseT = {0.8f, 0.0f, 0.0f, 1.0f};
-        float[] matSpecularT = {0.8f, 0.8f, 0.8f, 1.0f};
-        float matShininessT = 200;
-        materialTorch = new Material(matEmissionT, matAmbientT,
-                matDiffuseT, matSpecularT, matShininessT);
 
 
         // Verify if VBO-Support is available
@@ -459,22 +444,26 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         gl.glEnableVertexAttribArray(3);
         gl.glVertexAttribPointer(3, 2, GL.GL_FLOAT, false, 11 * 4, 9 * 4);
 
+        float[] matEmission = {0, 0, 0, 1f};
+        float[] matAmbient = {0.53333f, 0.11765f, 0.59412f, 1};
+        float[] matDiffuse = {0.8f, 0.0f, 0.0f, 1.0f};
+        float[] matSpecular = {0.8f, 0.8f, 0.8f, 1.0f};
+        float matShininess = 10.0f;
+        materialLab = new Material(matEmission, matAmbient,
+                matDiffuse, matSpecular, matShininess);
 
         // Load and prepare texture
         Texture texture = null;
         try {
-            File textureFile = new File(texturePath + textureFileName);
+            File textureFile = new File(texturePath+textureFileName);
             texture = TextureIO.newTexture(textureFile, true);
-
-            texture.setTexParameteri(gl, gl.GL_TEXTURE_MIN_FILTER, gl.GL_LINEAR);
-            texture.setTexParameteri(gl, gl.GL_TEXTURE_MAG_FILTER, gl.GL_LINEAR);
             texture.setTexParameteri(gl, gl.GL_TEXTURE_WRAP_S, gl.GL_REPEAT);
             texture.setTexParameteri(gl, gl.GL_TEXTURE_WRAP_T, gl.GL_REPEAT);
         } catch (IOException e) {
             e.printStackTrace();
         }
         if (texture != null)
-            System.out.println("Texture loaded successfully from: " + texturePath + textureFileName);
+            System.out.println("Texture loaded successfully from: " + texturePath+textureFileName);
         else
             System.err.println("Error loading textue.");
         System.out.println("  Texture height: " + texture.getImageHeight());
@@ -487,7 +476,7 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         gl.glActiveTexture(GL_TEXTURE0);
         // Use texture as 2D texture (might have to go to "display()")
         gl.glBindTexture(GL_TEXTURE_2D, texture.getTextureObject(gl));
-        // END: Prepare cube for drawing
+
     }
 
     private void initFloor(GL3 gl, float width, float height, float depth, int i) {
@@ -528,34 +517,39 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         gl.glEnableVertexAttribArray(3);
         gl.glVertexAttribPointer(3, 2, GL.GL_FLOAT, false, 11 * 4, 9 * 4);
 
+        float[] matEmission = {0, 0, 0, 1f};
+        float[] matAmbient = {0.53333f, 0.11765f, 0.59412f, 1};
+        float[] matDiffuse = {0.8f, 0.0f, 0.0f, 1.0f};
+        float[] matSpecular = {0.8f, 0.8f, 0.8f, 1.0f};
+        float matShininess = 100.0f;
+        materialLab = new Material(matEmission, matAmbient,
+                matDiffuse, matSpecular, matShininess);
 
         // Load and prepare texture
-        Texture texture2 = null;
+        Texture texture = null;
         try {
-            File textureFile2 = new File(texturePath + textureFileName);
-            texture2 = TextureIO.newTexture(textureFile2, true);
-
-            texture2.setTexParameteri(gl, gl.GL_TEXTURE_MIN_FILTER, gl.GL_LINEAR);
-            texture2.setTexParameteri(gl, gl.GL_TEXTURE_MAG_FILTER, gl.GL_LINEAR);
-            texture2.setTexParameteri(gl, gl.GL_TEXTURE_WRAP_S, gl.GL_REPEAT);
-            texture2.setTexParameteri(gl, gl.GL_TEXTURE_WRAP_T, gl.GL_REPEAT);
+            File textureFile = new File(texturePath+textureFileName);
+            texture = TextureIO.newTexture(textureFile, true);
+            texture.setTexParameteri(gl, gl.GL_TEXTURE_WRAP_S, gl.GL_REPEAT);
+            texture.setTexParameteri(gl, gl.GL_TEXTURE_WRAP_T, gl.GL_REPEAT);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if (texture2 != null)
-            System.out.println("Texture loaded successfully from: " + texturePath + textureFileName);
+        if (texture != null)
+            System.out.println("Texture loaded successfully from: " + texturePath+textureFileName);
         else
-            System.err.println("Error loading texture.");
-            System.out.println("  Texture height: " + texture2.getImageHeight());
-            System.out.println("  Texture width: " + texture2.getImageWidth());
-            System.out.println("  Texture object: " + texture2.getTextureObject(gl));
-            System.out.println("  Estimated memory size of texture: " + texture2.getEstimatedMemorySize());
+            System.err.println("Error loading textue.");
+        System.out.println("  Texture height: " + texture.getImageHeight());
+        System.out.println("  Texture width: " + texture.getImageWidth());
+        System.out.println("  Texture object: " + texture.getTextureObject(gl));
+        System.out.println("  Estimated memory size of texture: " + texture.getEstimatedMemorySize());
 
-        texture2.enable(gl);
+        texture.enable(gl);
         // Activate texture in slot 0 (might have to go to "display()")
         gl.glActiveTexture(GL_TEXTURE0);
         // Use texture as 2D texture (might have to go to "display()")
-        gl.glBindTexture(GL_TEXTURE_2D, texture2.getTextureObject(gl));
+        gl.glBindTexture(GL_TEXTURE_2D, texture.getTextureObject(gl));
+
         // END: Prepare cube for drawing
     }
 
@@ -585,6 +579,30 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
             fileException.printStackTrace();
             System.exit(1);
         }
+
+        // Activate and order vertex buffer object data for the vertex shader
+        // The vertex buffer contains: position (3), color (3), normals (3)
+        // Defining input for vertex shader
+        // Pointer for the vertex shader to the position information per vertex
+        gl.glEnableVertexAttribArray(0);
+        gl.glVertexAttribPointer(0, 3, GL.GL_FLOAT, false, 11 * 4, 0);
+        // Pointer for the vertex shader to the color information per vertex
+        gl.glEnableVertexAttribArray(1);
+        gl.glVertexAttribPointer(1, 3, GL.GL_FLOAT, false, 11 * 4, 3 * 4);
+        // Pointer for the vertex shader to the normal information per vertex
+        gl.glEnableVertexAttribArray(2);
+        gl.glVertexAttribPointer(2, 3, GL.GL_FLOAT, false, 11 * 4, 6 * 4);
+        // Pointer for the vertex shader to the texture coordinates information per vertex
+        gl.glEnableVertexAttribArray(3);
+        gl.glVertexAttribPointer(3, 2, GL.GL_FLOAT, false, 11 * 4, 9 * 4);
+
+        float[] matEmissionT = {0.5f, 0.5f, 0.5f, .25f};
+        float[] matAmbientT = {0.5f, 0.5f, 0.5f, .25f};
+        float[] matDiffuseT = {0.8f, 0.0f, 0.0f, .25f};
+        float[] matSpecularT = {0.8f, 0.8f, 0.8f, .25f};
+        float matShininessT = 200;
+        materialTorch = new Material(matEmissionT, matAmbientT,
+                matDiffuseT, matSpecularT, matShininessT);
 
         // enable shading
         gl.glEnable(gl.GL_LIGHTING);
@@ -1119,7 +1137,7 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
 
     public void displayPumpkin(GL2 gl, float xCoor, float yCoor, float zCoor) {
 
-        gl.glUseProgram(shaderProgramLab.getShaderProgramID());
+        gl.glUseProgram(shaderProgramTorches.getShaderProgramID());
         // Transfer the PVM-Matrix (model-view and projection matrix) to the vertex shader
         gl.glUniformMatrix4fv(0, 1, false, pmvMatrix.glGetPMatrixf());
         gl.glUniformMatrix4fv(1, 1, false, pmvMatrix.glGetMvMatrixf());
@@ -1128,16 +1146,16 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         gl.glUniformMatrix4fv(2, 1, false,
                 pmvMatrix.glGetMvitMatrixf());
 // transfer parameters of light source
-        gl.glUniform4fv(3, 1, lightLab.getPosition(), 0);
-        gl.glUniform4fv(4, 1, lightLab.getAmbient(), 0);
-        gl.glUniform4fv(5, 1, lightLab.getDiffuse(), 0);
-        gl.glUniform4fv(6, 1, lightLab.getSpecular(), 0);
+        gl.glUniform4fv(3, 1, lightTorch.getPosition(), 0);
+        gl.glUniform4fv(4, 1, lightTorch.getAmbient(), 0);
+        gl.glUniform4fv(5, 1, lightTorch.getDiffuse(), 0);
+        gl.glUniform4fv(6, 1, lightTorch.getSpecular(), 0);
 // transfer material parameters
-        gl.glUniform4fv(7, 1, materialLab.getEmission(), 0);
-        gl.glUniform4fv(8, 1, materialLab.getAmbient(), 0);
-        gl.glUniform4fv(9, 1, materialLab.getDiffuse(), 0);
-        gl.glUniform4fv(10, 1, materialLab.getSpecular(), 0);
-        gl.glUniform1f(11, materialLab.getShininess());
+        gl.glUniform4fv(7, 1, materialTorch.getEmission(), 0);
+        gl.glUniform4fv(8, 1, materialTorch.getAmbient(), 0);
+        gl.glUniform4fv(9, 1, materialTorch.getDiffuse(), 0);
+        gl.glUniform4fv(10, 1, materialTorch.getSpecular(), 0);
+        gl.glUniform1f(11, materialTorch.getShininess());
 
         gl.glBindVertexArray(vaoName[1]);
 
