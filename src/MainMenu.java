@@ -9,6 +9,18 @@ import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.*;
 
+import org.opencv.core.*;
+import org.opencv.core.Point;
+import org.opencv.highgui.HighGui;
+import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.imgproc.Imgproc;
+import org.opencv.video.BackgroundSubtractor;
+import org.opencv.video.BackgroundSubtractorKNN;
+import org.opencv.video.BackgroundSubtractorMOG2;
+import org.opencv.videoio.VideoCapture;
+import org.opencv.videoio.Videoio;
+import org.opencv.video.Video;
+
 public class MainMenu extends JFrame{
 
     public Font spookyFont;

@@ -1,4 +1,7 @@
 import java.awt.*;
+import java.util.Arrays;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
@@ -8,6 +11,8 @@ import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.sun.tools.javac.Main;
+import org.opencv.core.Core;
+import org.opencv.videoio.VideoCapture;
 
 
 public class GameWindow {
@@ -61,7 +66,7 @@ public class GameWindow {
         menuPanel.setBackground(Color.BLACK);
         menuPanel.setSize(500, splitPane.getHeight());
 
-        GridLayout grid = new GridLayout(4,1, 0,32);
+        GridLayout grid = new GridLayout(5,1, 0,32);
         menuPanel.setLayout(grid);
         menuPanel.setBorder(BorderFactory.createEmptyBorder(150, 50, 0, 50));
 
@@ -134,9 +139,15 @@ public class GameWindow {
 
     public void createCameraView(JPanel menuPanel) {
 
+
         if(Webcam.getDefault()!=null) {
-            Camera webcam = new Camera(Webcam.getDefault());
-            menuPanel.add(webcam.getPanel());
+            Timer t = new Timer();
+            t.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    menuPanel.add(Camera.Webcam.Camera());
+                }
+            }, 0, 1);
         }
         else {
          noCameraText = new JLabel("Es wurde keine Kamera erkannt!");
