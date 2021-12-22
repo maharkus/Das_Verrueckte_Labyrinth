@@ -91,7 +91,6 @@ public class MainMenu extends JFrame{
                 loadingScreen.setSize(frame.getSize());
                 frame.add(loadingScreen);
                 game = new GameWindow(frame);
-                canvas = game.getCanvas();
                 frame.add(game.splitPane);
                 frame.setVisible(true);
                 game.animator.start();
