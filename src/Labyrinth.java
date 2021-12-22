@@ -58,30 +58,30 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
 
     // taking shader source code files from relative path
     private final String shaderPath = ".\\resources\\";
-    // Shader for object 0
-    private final String vertexShader0FileName = "BlinnPhongPointTex.vert";
-    private final String fragmentShader0FileName = "BlinnPhongPointTex.frag";
+    private final String fragShader = "BlinnPhongPoint.frag";
+    private final String vertShader = "BlinnPhongPoint.vert";
+
+
+    private ShaderProgram shaderProgramLab;
+    private ShaderProgram shaderProgramBones;
+    private ShaderProgram shaderProgramTorches;
+    private ShaderProgram shaderProgramPumpkin;
+
+    private LightSource lightLab;
+    private Material materialLab;
+    private LightSource lightTorch;
+    private Material materialTorch;
 
     // taking texture files from relative path
     private final String texturePath = ".\\resources\\";
     final String textureFileName = "rock_texture.jpg";
-
-    private ShaderProgram shaderProgram0;
-    private ShaderProgram shaderProgram;
 
     // Pointers (names) for data transfer and handling on GPU
     private int[] vaoName;  // Name of vertex array object
     private int[] vboName;    // Name of vertex buffer object
     private int[] iboName;    // Name of index buffer object
 
-    // Define Materials
-    private Material material0;
 
-    // Define light sources
-    private LightSource light0;
-    private LightSource light1;
-    private LightSource light2;
-    private LightSource light3;
 
     // Object for handling keyboard and mouse interaction
     private InteractionHandler interactionHandler;
@@ -153,6 +153,41 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         System.err.println("GL_VENDOR: " + gl.glGetString(GL.GL_VENDOR));
         System.err.println("GL_RENDERER: " + gl.glGetString(GL.GL_RENDERER));
         System.err.println("GL_VERSION: " + gl.glGetString(GL.GL_VERSION));
+
+
+        // Light of Labyrinth
+        float[] lightPosition = {0.0f, 5000.0f, 0f, 1f};
+        float[] lightAmbientColor = {0.33333f, 0.11765f, 0.89412f, .5f};
+        float[] lightDiffuseColor = {0.2f, 0.3f, 0.4f, .3f};
+        float[] lightSpecularColor = {0.4f, 0.3f, 0.2f, .3f};
+        lightLab = new LightSource(lightPosition, lightAmbientColor,
+                lightDiffuseColor, lightSpecularColor);
+
+        float[] matEmission = {0, 0, 0, 1f};
+        float[] matAmbient = {0.53333f, 0.11765f, 0.59412f, 1};
+        float[] matDiffuse = {0.8f, 0.0f, 0.0f, 1.0f};
+        float[] matSpecular = {0.8f, 0.8f, 0.8f, 1.0f};
+        float matShininess = 10.0f;
+        materialLab = new Material(matEmission, matAmbient,
+                matDiffuse, matSpecular, matShininess);
+
+
+        // Light of Torches
+        float[] lightPositionT = {0.0f, 0f, 0f, 1f};
+        float[] lightAmbientColorT = {1, 0, 0, .5f};
+        float[] lightDiffuseColorT = {1, 0, 0, .5f};
+        float[] lightSpecularColorT = {1f, 0, 0f, .5f};
+        lightTorch = new LightSource(lightPositionT, lightAmbientColorT,
+                lightDiffuseColorT, lightSpecularColorT);
+
+        float[] matEmissionT = {0.5f, 0.5f, 0.5f, 1.0f};
+        float[] matAmbientT = {0.5f, 0.5f, 0.5f, 1.0f};
+        float[] matDiffuseT = {0.8f, 0.0f, 0.0f, 1.0f};
+        float[] matSpecularT = {0.8f, 0.8f, 0.8f, 1.0f};
+        float matShininessT = 200;
+        materialTorch = new Material(matEmissionT, matAmbientT,
+                matDiffuseT, matSpecularT, matShininessT);
+
 
         // Verify if VBO-Support is available
         if (!gl.isExtensionAvailable("GL_ARB_vertex_buffer_object"))
@@ -363,50 +398,17 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         initFloor(gl, 420, 1, 440, noOfObjects - 1);
         initBlender(drawable);
 
-        // Light of Labyrinth
-        float[] lightPosition = {0.0f, 700.0f, 0f, 0.5f};
-        float[] lightAmbientColor = {0.53333f, 0.11765f, 0.89412f, 1f};
-        float[] lightDiffuseColor = {0.1f, 0.2f, 0.3f, .5f};
-        float[] lightSpecularColor = {0.3f, 0.2f, 0.1f, .5f};
-        light0 = new LightSource(lightPosition, lightAmbientColor,
-                lightDiffuseColor, lightSpecularColor);
-
-        // Light of torches
-        float[] lightPosition2 = {0.0f, 30.0f, 0.0f, 1.0f};
-        float[] lightAmbientColor2 = {0.26275f, 0.29412f, 0.30196f, 1f};
-        float[] lightDiffuseColor2 = {0.1f, 0.2f, 0.3f, .5f};
-        float[] lightSpecularColor2 = {0.3f, 0.2f, 0.1f, .5f};
-
-        light1 = new LightSource(lightPosition2, lightAmbientColor2,
-                lightDiffuseColor2, lightSpecularColor2);
-
-        // Light of bones/skulls
-        float[] lightPosition3 = {0.0f, 0f, 0.0f, 1.0f};
-        float[] lightAmbientColor3 = {1f, 1f, 1f, 1f};
-        float[] lightDiffuseColor3 = {0.1f, 0.1f, 0.1f, .5f};
-        float[] lightSpecularColor3 = {0.1f, 0.1f, 0.1f, .5f};
-
-        light2 = new LightSource(lightPosition3, lightAmbientColor3,
-                lightDiffuseColor3, lightSpecularColor3);
-
-        // Light of pumpkin
-        float[] lightPosition4 = {0.0f, 0f, 0.0f, 1.0f};
-        float[] lightAmbientColor4 = {1f, 0.4f, 0f, 1f};
-        float[] lightDiffuseColor4 = {1f, 0.4f, 0f, .5f};
-        float[] lightSpecularColor4 = {1f, 0.4f, 0f, .5f};
-        //0.64706f
-
-        light3 = new LightSource(lightPosition4, lightAmbientColor4,
-                lightDiffuseColor4, lightSpecularColor4);
-        // END: Preparing scene
-
 
         // Switch on back face culling
         gl.glEnable(GL.GL_CULL_FACE);
+
+        gl.glPolygonMode(GL.GL_FRONT_AND_BACK, gl.GL_FILL);
+
         gl.glCullFace(GL.GL_BACK);
 //        gl.glCullFace(GL.GL_FRONT);
         // Switch on depth test
         gl.glEnable(GL.GL_DEPTH_TEST);
+
 
         // Create projection-model-view matrix
         pmvMatrix = new PMVMatrix();
@@ -422,9 +424,9 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
 
         float[] color = {1f, 1f, 1f, 1f};
         gl.glBindVertexArray(vaoName[i]);
-        shaderProgram0 = new ShaderProgram(gl);
-        shaderProgram0.loadShaderAndCreateProgram(shaderPath,
-                vertexShader0FileName, fragmentShader0FileName);
+        shaderProgramLab = new ShaderProgram(gl);
+        shaderProgramLab.loadShaderAndCreateProgram(shaderPath,
+                vertShader, fragShader);
 
         float[] cubeVertices = BoxTex.makeBoxVertices(width, height, depth, color);
         int[] cubeIndices = BoxTex.makeBoxIndicesForTriangleStrip();
@@ -457,21 +459,6 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         gl.glEnableVertexAttribArray(3);
         gl.glVertexAttribPointer(3, 2, GL.GL_FLOAT, false, 11 * 4, 9 * 4);
 
-        // Specification of material parameters (blue material)
-//        float[] matEmission = {0.0f, 0.0f, 0.0f, 1.0f};
-//        float[] matAmbient =  {0.0f, 0.0f, 0.1f, 1.0f};
-//        float[] matDiffuse =  {0.1f, 0.2f, 0.7f, 1.0f};
-//        float[] matSpecular = {0.7f, 0.7f, 0.7f, 1.0f};
-//        float matShininess = 200.0f;
-
-        // Metallic material
-        float[] matEmission = {0.0f, 0.0f, 0.0f, 1.0f};
-        float[] matAmbient = {0.4f, 0.4f, 0.4f, 1.0f};
-        float[] matDiffuse = {0.5f, 0.5f, 0.5f, 1.0f};
-        float[] matSpecular = {0.4f, 0.6f, 0.8f, 1.0f};
-        float matShininess = 1.0f;
-
-        material0 = new Material(matEmission, matAmbient, matDiffuse, matSpecular, matShininess);
 
         // Load and prepare texture
         Texture texture = null;
@@ -509,12 +496,9 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
 
         gl.glBindVertexArray(vaoName[i]);
 
-        shaderProgram = new ShaderProgram(gl);
-        shaderProgram.loadShaderAndCreateProgram(shaderPath,
-                vertexShader0FileName, fragmentShader0FileName);
-
         float[] cubeVertices = BoxTex.makeBoxVertices(width, height, depth, color);
         int[] cubeIndices = BoxTex.makeBoxIndicesForTriangleStrip();
+
 
         // activate and initialize vertex buffer object (VBO)
         gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboName[i]);
@@ -544,14 +528,6 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         gl.glEnableVertexAttribArray(3);
         gl.glVertexAttribPointer(3, 2, GL.GL_FLOAT, false, 11 * 4, 9 * 4);
 
-        // Metallic material
-        float[] matEmission = {0.0f, 0.0f, 0.0f, 1.0f};
-        float[] matAmbient = {0.4f, 0.4f, 0.4f, 1.0f};
-        float[] matDiffuse = {0.5f, 0.5f, 0.5f, 1.0f};
-        float[] matSpecular = {0.4f, 0.6f, 0.8f, 1.0f};
-        float matShininess = 1.0f;
-
-        material0 = new Material(matEmission, matAmbient, matDiffuse, matSpecular, matShininess);
 
         // Load and prepare texture
         Texture texture2 = null;
@@ -570,10 +546,10 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
             System.out.println("Texture loaded successfully from: " + texturePath + textureFileName);
         else
             System.err.println("Error loading texture.");
-        System.out.println("  Texture height: " + texture2.getImageHeight());
-        System.out.println("  Texture width: " + texture2.getImageWidth());
-        System.out.println("  Texture object: " + texture2.getTextureObject(gl));
-        System.out.println("  Estimated memory size of texture: " + texture2.getEstimatedMemorySize());
+            System.out.println("  Texture height: " + texture2.getImageHeight());
+            System.out.println("  Texture width: " + texture2.getImageWidth());
+            System.out.println("  Texture object: " + texture2.getTextureObject(gl));
+            System.out.println("  Estimated memory size of texture: " + texture2.getEstimatedMemorySize());
 
         texture2.enable(gl);
         // Activate texture in slot 0 (might have to go to "display()")
@@ -593,6 +569,10 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         System.err.println("GL_RENDERER: " + gl.glGetString(GL.GL_RENDERER));
         System.err.println("GL_VERSION: " + gl.glGetString(GL.GL_VERSION));
 
+        shaderProgramTorches = new ShaderProgram(gl);
+        shaderProgramTorches.loadShaderAndCreateProgram(shaderPath,
+                vertShader, fragShader);
+
         try {
             skullRotVertices = scaledObj(4, new OBJLoader().setLoadNormals(true).loadMesh(Resource.file(skullRotObj)).getVertices());
             bigSkullVertices = scaledObj(12, new OBJLoader().setLoadNormals(true).loadMesh(Resource.file(skullObj)).getVertices());
@@ -605,9 +585,6 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
             fileException.printStackTrace();
             System.exit(1);
         }
-
-        // Background color of the GLCanvas
-        gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
         // enable shading
         gl.glEnable(gl.GL_LIGHTING);
@@ -653,14 +630,6 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         pmvMatrix.glRotatef(interactionHandler.getAngleXaxis(), 1f, 0f, 0f);
         pmvMatrix.glRotatef(interactionHandler.getAngleYaxis(), 0f, 1f, 0f);
 
-        // Camera for debugging
-        /*pmvMatrix.gluLookAt(0f, 0f, 600f,
-                0f, 0f, 0f,
-                0f, 1.0f, 0f);
-        pmvMatrix.glTranslatef(interactionHandler.getxPosition(), interactionHandler.getyPosition(), 0f);
-        pmvMatrix.glRotatef(interactionHandler.getAngleXaxis(), 1f, 0f, 0f);
-        pmvMatrix.glRotatef(interactionHandler.getAngleYaxis(), 0f, 1f, 0f);*/
-
 
         //Place all walls
         for (int i = 0; i < noOfWalls; i++) {
@@ -675,63 +644,93 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         displayObject(gl, 21);
         pmvMatrix.glPopMatrix();
 
+
         //display blender .obj
-        displayBigSkull(gl2, -184f, 30, 178);
-        displaySkull(gl2,-170.5f, 0,-75);
-        displaySkull(gl2,-150.5f, 0,-15);
-        displaySkull(gl2,-160.5f, 0,60);
-        displaySkull(gl2,-120.5f, 0,5);
-        displaySkull(gl2,-100.5f, 0,55);
-        displaySkull(gl2,-125.5f, 0,-60);
-        displaySkull(gl2,-90.5f, 0,-85);
-        displaySkull(gl2,-150.5f, 0,80);
+        pmvMatrix.glPushMatrix();
+        pmvMatrix.glTranslatef(0, 0, 0);
+        displayBigSkull(gl2, -184f, 0, 178);
+        pmvMatrix.glPopMatrix();
 
-        displayTorch(gl2, 82.5f,30,-10);
-        displayTorch(gl2, 132.5f,30,-10);
-        displayTorch(gl2, 132.5f,30,160);
-        displayTorch(gl2, 187.5f,30,160);
-        displayTorch(gl2, 32.5f, 30,150);
-        displayTorch(gl2, 82.f, 30,110);
-        displayTorch(gl2, -67, 30,-55);
-        displayTorch(gl2, -67, 30,35);
-        displayTorch(gl2, 187.5f,30,-10);
-        displayTorch(gl2, 187.5f,30,-178);
-        displayTorch(gl2, 187.5f,30,-126);
+        pmvMatrix.glPushMatrix();
+        pmvMatrix.glTranslatef(0, 0, 0);
+        pmvMatrix.glRotatef(70,0,1,0);
+        displaySkull(gl2,-170.5f, -25,-75);
+        pmvMatrix.glPopMatrix();
 
-        displayTorch180(gl2, -52.5f,30,96);
-        displayTorch180(gl2, -52.5f,30,-96);
-        displayTorch180(gl2, -187.5f, 30,-55);
-        displayTorch180(gl2, -187.5f,30,35);
-        displayTorch180(gl2, -187.5f,30,-178);
+        pmvMatrix.glPushMatrix();
+        pmvMatrix.glRotatef(42,0,1,0);
+        pmvMatrix.glTranslatef(0, 0, 0);
+        displaySkull(gl2,-150.5f, -25,-15);
+        pmvMatrix.glPopMatrix();
 
-        displayBone(gl2,-150.5f, 2,-100);
-        displayBone(gl2,-100.5f, 2,70);
-        displayBone(gl2,-130.5f, 2,30);
-        displayBone(gl2,-105.5f, 2,100);
-        displayBone(gl2,-170.5f, 2,-15);
-        displayBone(gl2,-110.5f, 2,-30);
-        displayBone(gl2,-135.5f, 2,-80);
-        displayBone(gl2,-125.5f, 2,140);
+        pmvMatrix.glPushMatrix();
+        pmvMatrix.glTranslatef(0, 0, 0);
+        pmvMatrix.glRotatef(2,0,1,0);
+        displaySkull(gl2,-160.5f, -25,60);
+        pmvMatrix.glPopMatrix();
 
-        displayPumpkin(gl2, -160,5,162);
-        displayPumpkin(gl2, 180,5,-192);
-        displayPumpkin(gl2, 102,5,62);
-        displayPumpkin(gl2, -180, 5,-130);
-        displayPumpkin(gl2, -180, 5,-130);
+        pmvMatrix.glPushMatrix();
+        pmvMatrix.glTranslatef(0, 0, 0);
+        pmvMatrix.glRotatef(33,0,1,0);
+        displaySkull(gl2,-120.5f, -25,5);
+        pmvMatrix.glPopMatrix();
 
+        pmvMatrix.glPushMatrix();
+        pmvMatrix.glTranslatef(0, 0, 0);
+        pmvMatrix.glRotatef(21,0,1,0);
+        displaySkull(gl2,-100.5f, -25,55);
+        pmvMatrix.glPopMatrix();
 
-        gl.glBindVertexArray(vaoName[noOfWalls]);
+        pmvMatrix.glPushMatrix();
+        pmvMatrix.glTranslatef(0, 0, 0);
+        pmvMatrix.glRotatef(55,0,1,0);
+        displaySkull(gl2,-125.5f, -25,-60);
+        pmvMatrix.glPopMatrix();
 
-        // Activating the compiled shader program.
-        // Could be placed into the init-method for this simple example.
-        gl.glUseProgram(shaderProgram.getShaderProgramID());
+        pmvMatrix.glPushMatrix();
+        pmvMatrix.glTranslatef(0, 0, 0);
+        pmvMatrix.glRotatef(5,0,1,0);
+        displaySkull(gl2,-90.5f, -25,-85);
+        pmvMatrix.glPopMatrix();
 
-        // Transfer the PVM-Matrix (model-view and projection matrix) to the GPU
-        // via uniforms
-        // Transfer projection matrix via uniform layout position 0
-        gl.glUniformMatrix4fv(0, 1, false, pmvMatrix.glGetPMatrixf());
-        // Transfer model-view matrix via layout position 1
-        gl.glUniformMatrix4fv(1, 1, false, pmvMatrix.glGetMvMatrixf());
+        pmvMatrix.glPushMatrix();
+        pmvMatrix.glTranslatef(0, 0, 0);
+        pmvMatrix.glRotatef(10,0,1,0);
+        displaySkull(gl2,-150.5f, -25,80);
+        pmvMatrix.glPopMatrix();
+
+        displayTorch(gl2, 82.5f,5,-10);
+        displayTorch(gl2, 132.5f,5,-10);
+        displayTorch(gl2, 132.5f,5,160);
+        displayTorch(gl2, 187.5f,5,160);
+        displayTorch(gl2, 32.5f, 5,150);
+        displayTorch(gl2, 82.f, 5,110);
+        displayTorch(gl2, -67, 5,-55);
+        displayTorch(gl2, -67, 5,35);
+        displayTorch(gl2, 187.5f,5,-10);
+        displayTorch(gl2, 187.5f,5,-178);
+        displayTorch(gl2, 187.5f,5,-126);
+
+        displayTorch180(gl2, -52.5f,5,96);
+        displayTorch180(gl2, -52.5f,5,-96);
+        displayTorch180(gl2, -187.5f, 5,-55);
+        displayTorch180(gl2, -187.5f,5,35);
+        displayTorch180(gl2, -187.5f,5,-178);
+
+        displayBone(gl2,-150.5f, -23,-100);
+        displayBone(gl2,-100.5f, -23,70);
+        displayBone(gl2,-130.5f, -23,30);
+        displayBone(gl2,-105.5f, -23,100);
+        displayBone(gl2,-170.5f, -23,-15);
+        displayBone(gl2,-110.5f, -23,-30);
+        displayBone(gl2,-135.5f, -23,-80);
+        displayBone(gl2,-125.5f, -23,140);
+
+        displayPumpkin(gl2, -160,-20,162);
+        displayPumpkin(gl2, 180,-20,-192);
+        displayPumpkin(gl2, 102,-20,62);
+        displayPumpkin(gl2, -180, -20,-130);
+        displayPumpkin(gl2, -180, -20,-130);
 
         drawCurve(gl2, curvePoints);
     }
@@ -864,22 +863,22 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
 
     private void displayObject(GL3 gl, int i) {
         // BEGIN: Draw the second object (object 1)
-        gl.glUseProgram(shaderProgram0.getShaderProgramID());
+        gl.glUseProgram(shaderProgramLab.getShaderProgramID());
         // Transfer the PVM-Matrix (model-view and projection matrix) to the vertex shader
         gl.glUniformMatrix4fv(0, 1, false, pmvMatrix.glGetPMatrixf());
         gl.glUniformMatrix4fv(1, 1, false, pmvMatrix.glGetMvMatrixf());
         gl.glUniformMatrix4fv(2, 1, false, pmvMatrix.glGetMvitMatrixf());
         // transfer parameters of light source
-        gl.glUniform4fv(3, 1, light0.getPosition(), 0);
-        gl.glUniform4fv(4, 1, light0.getAmbient(), 0);
-        gl.glUniform4fv(5, 1, light0.getDiffuse(), 0);
-        gl.glUniform4fv(6, 1, light0.getSpecular(), 0);
+        gl.glUniform4fv(3, 1, lightLab.getPosition(), 0);
+        gl.glUniform4fv(4, 1, lightLab.getAmbient(), 0);
+        gl.glUniform4fv(5, 1, lightLab.getDiffuse(), 0);
+        gl.glUniform4fv(6, 1, lightLab.getSpecular(), 0);
         // transfer material parameters
-        gl.glUniform4fv(7, 1, material0.getEmission(), 0);
-        gl.glUniform4fv(8, 1, material0.getAmbient(), 0);
-        gl.glUniform4fv(9, 1, material0.getDiffuse(), 0);
-        gl.glUniform4fv(10, 1, material0.getSpecular(), 0);
-        gl.glUniform1f(11, material0.getShininess());
+        gl.glUniform4fv(7, 1, materialLab.getEmission(), 0);
+        gl.glUniform4fv(8, 1, materialLab.getAmbient(), 0);
+        gl.glUniform4fv(9, 1, materialLab.getDiffuse(), 0);
+        gl.glUniform4fv(10, 1, materialLab.getSpecular(), 0);
+        gl.glUniform1f(11, materialLab.getShininess());
 
         gl.glBindVertexArray(vaoName[i]);
 
@@ -889,10 +888,27 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
 
     public void displayTorch(GL2 gl, float xCoor, float yCoor, float zCoor) {
 
-        gl.glUniform4fv(3, 1, light1.getPosition(), 0);
-        gl.glUniform4fv(4, 1, light1.getAmbient(), 0);
-        gl.glUniform4fv(5, 1, light1.getDiffuse(), 0);
-        gl.glUniform4fv(6, 1, light1.getSpecular(), 0);
+        gl.glUseProgram(shaderProgramTorches.getShaderProgramID());
+        // Transfer the PVM-Matrix (model-view and projection matrix) to the vertex shader
+        gl.glUniformMatrix4fv(0, 1, false, pmvMatrix.glGetPMatrixf());
+        gl.glUniformMatrix4fv(1, 1, false, pmvMatrix.glGetMvMatrixf());
+
+        // transfer of transposed inverse of model view matrix
+        gl.glUniformMatrix4fv(2, 1, false,
+                pmvMatrix.glGetMvitMatrixf());
+// transfer parameters of light source
+        gl.glUniform4fv(3, 1, lightTorch.getPosition(), 0);
+        gl.glUniform4fv(4, 1, lightTorch.getAmbient(), 0);
+        gl.glUniform4fv(5, 1, lightTorch.getDiffuse(), 0);
+        gl.glUniform4fv(6, 1, lightTorch.getSpecular(), 0);
+// transfer material parameters
+        gl.glUniform4fv(7, 1, materialTorch.getEmission(), 0);
+        gl.glUniform4fv(8, 1, materialTorch.getAmbient(), 0);
+        gl.glUniform4fv(9, 1, materialTorch.getDiffuse(), 0);
+        gl.glUniform4fv(10, 1, materialTorch.getSpecular(), 0);
+        gl.glUniform1f(11, materialTorch.getShininess());
+
+        gl.glBindVertexArray(vaoName[1]);
 
         // BEGIN: definition of scene content (i.e. objects, models)
         gl.glBegin(GL.GL_TRIANGLES);
@@ -919,6 +935,27 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
 
     public void displayTorch180(GL2 gl, float xCoor, float yCoor, float zCoor) {
 
+        gl.glUseProgram(shaderProgramTorches.getShaderProgramID());
+        // Transfer the PVM-Matrix (model-view and projection matrix) to the vertex shader
+        gl.glUniformMatrix4fv(0, 1, false, pmvMatrix.glGetPMatrixf());
+        gl.glUniformMatrix4fv(1, 1, false, pmvMatrix.glGetMvMatrixf());
+
+        // transfer of transposed inverse of model view matrix
+        gl.glUniformMatrix4fv(2, 1, false,
+                pmvMatrix.glGetMvitMatrixf());
+// transfer parameters of light source
+        gl.glUniform4fv(3, 1, lightTorch.getPosition(), 0);
+        gl.glUniform4fv(4, 1, lightTorch.getAmbient(), 0);
+        gl.glUniform4fv(5, 1, lightTorch.getDiffuse(), 0);
+        gl.glUniform4fv(6, 1, lightTorch.getSpecular(), 0);
+// transfer material parameters
+        gl.glUniform4fv(7, 1, materialTorch.getEmission(), 0);
+        gl.glUniform4fv(8, 1, materialTorch.getAmbient(), 0);
+        gl.glUniform4fv(9, 1, materialTorch.getDiffuse(), 0);
+        gl.glUniform4fv(10, 1, materialTorch.getSpecular(), 0);
+        gl.glUniform1f(11, materialTorch.getShininess());
+
+        gl.glBindVertexArray(vaoName[1]);
         // BEGIN: definition of scene content (i.e. objects, models)
         gl.glBegin(GL.GL_TRIANGLES);
         {
@@ -943,10 +980,27 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
 
     public void displayBigSkull(GL2 gl, float xCoor, float yCoor, float zCoor) {
 
-        gl.glUniform4fv(3, 1, light2.getPosition(), 0);
-        gl.glUniform4fv(4, 1, light2.getAmbient(), 0);
-        gl.glUniform4fv(5, 1, light2.getDiffuse(), 0);
-        gl.glUniform4fv(6, 1, light2.getSpecular(), 0);
+        gl.glUseProgram(shaderProgramLab.getShaderProgramID());
+        // Transfer the PVM-Matrix (model-view and projection matrix) to the vertex shader
+        gl.glUniformMatrix4fv(0, 1, false, pmvMatrix.glGetPMatrixf());
+        gl.glUniformMatrix4fv(1, 1, false, pmvMatrix.glGetMvMatrixf());
+
+        // transfer of transposed inverse of model view matrix
+        gl.glUniformMatrix4fv(2, 1, false,
+                pmvMatrix.glGetMvitMatrixf());
+// transfer parameters of light source
+        gl.glUniform4fv(3, 1, lightLab.getPosition(), 0);
+        gl.glUniform4fv(4, 1, lightLab.getAmbient(), 0);
+        gl.glUniform4fv(5, 1, lightLab.getDiffuse(), 0);
+        gl.glUniform4fv(6, 1, lightLab.getSpecular(), 0);
+// transfer material parameters
+        gl.glUniform4fv(7, 1, materialLab.getEmission(), 0);
+        gl.glUniform4fv(8, 1, materialLab.getAmbient(), 0);
+        gl.glUniform4fv(9, 1, materialLab.getDiffuse(), 0);
+        gl.glUniform4fv(10, 1, materialLab.getSpecular(), 0);
+        gl.glUniform1f(11, materialLab.getShininess());
+
+        gl.glBindVertexArray(vaoName[1]);
 
         // BEGIN: definition of scene content (i.e. objects, models)
         gl.glBegin(GL.GL_TRIANGLES);
@@ -972,10 +1026,27 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
 
     public void displaySkull(GL2 gl, float xCoor, float yCoor, float zCoor) {
 
-        gl.glUniform4fv(3, 1, light2.getPosition(), 0);
-        gl.glUniform4fv(4, 1, light2.getAmbient(), 0);
-        gl.glUniform4fv(5, 1, light2.getDiffuse(), 0);
-        gl.glUniform4fv(6, 1, light2.getSpecular(), 0);
+        gl.glUseProgram(shaderProgramLab.getShaderProgramID());
+        // Transfer the PVM-Matrix (model-view and projection matrix) to the vertex shader
+        gl.glUniformMatrix4fv(0, 1, false, pmvMatrix.glGetPMatrixf());
+        gl.glUniformMatrix4fv(1, 1, false, pmvMatrix.glGetMvMatrixf());
+
+        // transfer of transposed inverse of model view matrix
+        gl.glUniformMatrix4fv(2, 1, false,
+                pmvMatrix.glGetMvitMatrixf());
+// transfer parameters of light source
+        gl.glUniform4fv(3, 1, lightLab.getPosition(), 0);
+        gl.glUniform4fv(4, 1, lightLab.getAmbient(), 0);
+        gl.glUniform4fv(5, 1, lightLab.getDiffuse(), 0);
+        gl.glUniform4fv(6, 1, lightLab.getSpecular(), 0);
+// transfer material parameters
+        gl.glUniform4fv(7, 1, materialLab.getEmission(), 0);
+        gl.glUniform4fv(8, 1, materialLab.getAmbient(), 0);
+        gl.glUniform4fv(9, 1, materialLab.getDiffuse(), 0);
+        gl.glUniform4fv(10, 1, materialLab.getSpecular(), 0);
+        gl.glUniform1f(11, materialLab.getShininess());
+
+        gl.glBindVertexArray(vaoName[1]);
 
         // BEGIN: definition of scene content (i.e. objects, models)
         gl.glBegin(GL.GL_TRIANGLES);
@@ -1002,10 +1073,27 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
 
     public void displayBone(GL2 gl, float xCoor, float yCoor, float zCoor) {
 
-        gl.glUniform4fv(3, 1, light2.getPosition(), 0);
-        gl.glUniform4fv(4, 1, light2.getAmbient(), 0);
-        gl.glUniform4fv(5, 1, light2.getDiffuse(), 0);
-        gl.glUniform4fv(6, 1, light2.getSpecular(), 0);
+        gl.glUseProgram(shaderProgramLab.getShaderProgramID());
+        // Transfer the PVM-Matrix (model-view and projection matrix) to the vertex shader
+        gl.glUniformMatrix4fv(0, 1, false, pmvMatrix.glGetPMatrixf());
+        gl.glUniformMatrix4fv(1, 1, false, pmvMatrix.glGetMvMatrixf());
+
+        // transfer of transposed inverse of model view matrix
+        gl.glUniformMatrix4fv(2, 1, false,
+                pmvMatrix.glGetMvitMatrixf());
+// transfer parameters of light source
+        gl.glUniform4fv(3, 1, lightLab.getPosition(), 0);
+        gl.glUniform4fv(4, 1, lightLab.getAmbient(), 0);
+        gl.glUniform4fv(5, 1, lightLab.getDiffuse(), 0);
+        gl.glUniform4fv(6, 1, lightLab.getSpecular(), 0);
+// transfer material parameters
+        gl.glUniform4fv(7, 1, materialLab.getEmission(), 0);
+        gl.glUniform4fv(8, 1, materialLab.getAmbient(), 0);
+        gl.glUniform4fv(9, 1, materialLab.getDiffuse(), 0);
+        gl.glUniform4fv(10, 1, materialLab.getSpecular(), 0);
+        gl.glUniform1f(11, materialLab.getShininess());
+
+        gl.glBindVertexArray(vaoName[1]);
 
         // BEGIN: definition of scene content (i.e. objects, models)
         gl.glBegin(GL.GL_TRIANGLES);
@@ -1031,10 +1119,27 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
 
     public void displayPumpkin(GL2 gl, float xCoor, float yCoor, float zCoor) {
 
-        gl.glUniform4fv(3, 1, light3.getPosition(), 0);
-        gl.glUniform4fv(4, 1, light3.getAmbient(), 0);
-        gl.glUniform4fv(5, 1, light3.getDiffuse(), 0);
-        gl.glUniform4fv(6, 1, light3.getSpecular(), 0);
+        gl.glUseProgram(shaderProgramLab.getShaderProgramID());
+        // Transfer the PVM-Matrix (model-view and projection matrix) to the vertex shader
+        gl.glUniformMatrix4fv(0, 1, false, pmvMatrix.glGetPMatrixf());
+        gl.glUniformMatrix4fv(1, 1, false, pmvMatrix.glGetMvMatrixf());
+
+        // transfer of transposed inverse of model view matrix
+        gl.glUniformMatrix4fv(2, 1, false,
+                pmvMatrix.glGetMvitMatrixf());
+// transfer parameters of light source
+        gl.glUniform4fv(3, 1, lightLab.getPosition(), 0);
+        gl.glUniform4fv(4, 1, lightLab.getAmbient(), 0);
+        gl.glUniform4fv(5, 1, lightLab.getDiffuse(), 0);
+        gl.glUniform4fv(6, 1, lightLab.getSpecular(), 0);
+// transfer material parameters
+        gl.glUniform4fv(7, 1, materialLab.getEmission(), 0);
+        gl.glUniform4fv(8, 1, materialLab.getAmbient(), 0);
+        gl.glUniform4fv(9, 1, materialLab.getDiffuse(), 0);
+        gl.glUniform4fv(10, 1, materialLab.getSpecular(), 0);
+        gl.glUniform1f(11, materialLab.getShininess());
+
+        gl.glBindVertexArray(vaoName[1]);
 
         // BEGIN: definition of scene content (i.e. objects, models)
         gl.glBegin(GL.GL_TRIANGLES);
@@ -1057,19 +1162,6 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         gl.glEnd();
         // END: definition of scene content
     }
-/*
-    private float[] rotatedObj(float rotation, float[] objRotated) {
-
-        for (int i = 0; i < objRotated.length / 6; i++) {
-            objRotated[i*3] = (cos((float) Math.toRadians(rotation))) * objRotated[i*3] + (sin((float) Math.toRadians(rotation)) * objRotated[i*3]);
-            objRotated[i*3+2] = (-sin((float) Math.toRadians(rotation))) * objRotated[i*3+2] + cos(((float) Math.toRadians(rotation))) * objRotated[i*3+2];
-            objRotated[i*3+3] = (cos((float) Math.toRadians(rotation))) * objRotated[i*3+3] + (sin((float) Math.toRadians(rotation)) * objRotated[i*3+3]);
-            objRotated[i*3+5] = (-sin((float) Math.toRadians(rotation))) * objRotated[i*3+5] + cos(((float) Math.toRadians(rotation))) * objRotated[i*3+5];
-        }
-
-        return objRotated;
-    }
-*/
 
     private float[] scaledObj (float factor, float[] objScaled) {
 
@@ -1099,7 +1191,8 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
 
         // Detach and delete shader program
         gl.glUseProgram(0);
-        shaderProgram0.deleteShaderProgram();
+        shaderProgramLab.deleteShaderProgram();
+        shaderProgramTorches.deleteShaderProgram();
 
         // deactivate VAO and VBO
         gl.glBindVertexArray(0);
