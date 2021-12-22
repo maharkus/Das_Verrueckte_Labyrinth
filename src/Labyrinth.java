@@ -42,10 +42,6 @@ import com.jogamp.opengl.util.texture.TextureIO;
 import de.hshl.obj.loader.OBJLoader;
 import de.hshl.obj.loader.Resource;
 
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-
 import static com.jogamp.opengl.GL.*;
 import static com.jogamp.opengl.GL2.GL_MAP1_VERTEX_3;
 import static com.jogamp.opengl.math.FloatUtil.cos;
@@ -93,9 +89,7 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
     float[] nextFocus = new float[3];
     boolean focusSet = false;
 
-    enum directions {
-        right, up, left, down, stay
-    }
+    AmbientSounds ambientSounds = new AmbientSounds();
 
     private int noOfWalls;
     private float[] wallPos;
@@ -657,8 +651,8 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         pmvMatrix.gluLookAt(player.getPositionX(), player.getPositionY(), player.getPositionZ(),
                 player.getFocusX(), player.getFocusY(), player.getFocusZ(),
                 0f, 1f, 0f);
-        pmvMatrix.glRotatef(interactionHandler.getAngleXaxis(), 1f, 0f, 0f);
-        pmvMatrix.glRotatef(interactionHandler.getAngleYaxis(), 0f, 1f, 0f);
+        //pmvMatrix.glRotatef(interactionHandler.getAngleXaxis(), 1f, 0f, 0f);
+        //pmvMatrix.glRotatef(interactionHandler.getAngleYaxis(), 0f, 1f, 0f);
 
 
         //Place all walls
@@ -777,7 +771,6 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
             public void run() {
                 player.setPosition(moveBetweenPoints(player.getPosition(), newPos, player.getPosition()));
                 player.setFocus(moveBetweenPoints(player.getPosition(), newPos, player.getFocus()));
-                System.out.println(Arrays.toString(player.getFocus()));
                 if (Arrays.equals(player.getPosition(), newPos)) {
                     t.purge();
                     t.cancel();
@@ -794,17 +787,13 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
             File welcome = new File("resources/sounds/sackgasse.wav");
             new PlaySound(welcome,0);
         }
-        else if (curveIndex == 2) {
-            File spookySound = new File("resources/sounds/spookyWav.wav");
-            new PlaySound(spookySound,0);
-        }
         else if (curveIndex == 25) {
             new EndGame();
             File spookySound = new File("resources/sounds/dootDoot.wav");
             new PlaySound(spookySound, 0f);
         }
         else if (Math.random() < 1) {
-            new PlaySound(new RandomSound().getRandomFile(),-20);
+            new PlaySound(ambientSounds.getRandomFile(),-20);
         }
 
     }
