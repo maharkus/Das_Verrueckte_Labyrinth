@@ -135,8 +135,7 @@ public class GameWindow {
     public void createCameraView(JPanel menuPanel) {
 
         if(Webcam.getDefault()!=null) {
-            Camera webcam = new Camera(Webcam.getDefault());
-            menuPanel.add(webcam.getPanel());
+            menuPanel.add(Camera.Webcam.getVidpanel());
         }
         else {
          noCameraText = new JLabel("Es wurde keine Kamera erkannt!");

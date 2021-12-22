@@ -32,12 +32,14 @@ public class Webcam {
     static double camResHeight;
     static HandMotionCounter counter;
 
+    static JLabel vidpanel = new JLabel();
+
     public static void main(String[] args) {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
         Camera();
     }
 
-    public static void Camera (){
+    public static void Camera(){
 
         Mat frame = new Mat();
 
@@ -45,13 +47,9 @@ public class Webcam {
         //Zugriff auf Camera (0 für standard)
         VideoCapture camera = new VideoCapture(0);
 
-        if (camera.isOpened()) {
             //Zugriff auf Camera Auflösung
             camResWidth = camera.get(Videoio.CAP_PROP_FRAME_WIDTH);
             camResHeight = camera.get(Videoio.CAP_PROP_FRAME_HEIGHT);
-
-            //JLabel für JFrame
-            JLabel vidpanel = new JLabel();
 
             //JFrame + set contentPane
             JFrame window = new JFrame();
@@ -72,10 +70,6 @@ public class Webcam {
                     vidpanel.repaint();
                 }
             }
-        }
-        else {
-            System.out.println("No webcam detected");
-        }
 
     }
 
@@ -241,6 +235,10 @@ public class Webcam {
         BufferedImage processedesImage = convertMatToBufferedImage(mat);
 
         return processedesImage;
+    }
+
+    public static JLabel getVidpanel() {
+        return vidpanel;
     }
 
 
