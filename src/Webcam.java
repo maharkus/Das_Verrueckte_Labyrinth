@@ -1,38 +1,25 @@
-package Camera;
-
 import org.opencv.core.*;
 import org.opencv.core.Point;
-import org.opencv.highgui.HighGui;
-import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
-import org.opencv.video.BackgroundSubtractor;
-import org.opencv.video.BackgroundSubtractorKNN;
-import org.opencv.video.BackgroundSubtractorMOG2;
 import org.opencv.videoio.VideoCapture;
 import org.opencv.videoio.Videoio;
-import org.opencv.video.Video;
 
 import javax.swing.*;
 import javax.swing.JFrame;
 import java.awt.*;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.awt.image.WritableRaster;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import javax.swing.*;
-
-public class Webcam {
+public class Webcam{
 
     static double camResWidth;
     static double camResHeight;
     static HandMotionCounter counter;
 
-    public static JLabel Camera (){
+    public static void Camera(){
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
         Mat frame = new Mat();
@@ -40,14 +27,19 @@ public class Webcam {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
         VideoCapture camera = new VideoCapture(0);
 
-        // JLabel
-        JLabel vidpanel = new JLabel();
-
         //Zugriff auf Camera Auflösung
         camResWidth = camera.get(Videoio.CAP_PROP_FRAME_WIDTH);
         camResHeight = camera.get(Videoio.CAP_PROP_FRAME_HEIGHT);
 
-        vidpanel.setSize(new Dimension(500, 300));
+        // JLabel
+        JLabel vidpanel = new JLabel();
+
+        //JFrame + set contentPane
+        JFrame window = new JFrame();
+        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        window.add(vidpanel);
+        window.setSize(new Dimension((int)camResWidth, (int)camResHeight));
+        window.setVisible(true);
 
         if (camera.isOpened()) {
 
@@ -60,11 +52,12 @@ public class Webcam {
                     ImageIcon image = new ImageIcon(contourZeichnen(frame));
 
                     vidpanel.setIcon(image);
+                    vidpanel.setSize(new Dimension((int)camResWidth, (int)camResHeight));
+                    vidpanel.setVisible(true);
                     vidpanel.repaint();
                 }
             }
         }
-        return vidpanel;
     }
 
     public static BufferedImage convertMatToBufferedImage(final Mat mat) {
@@ -191,7 +184,8 @@ public class Webcam {
                     counter.increaseCounter0();
                     if(counter.getCounter()[0] == 30){
                         counter.resetCounter();
-                        System.out.println("Das funktioniert");
+                        GameWindow.
+                        canvas.move(canvas.curvePoints.get(canvas.player.getPositionIndex()).getDirections()[(int) (canvas.player.getAngle()/90)]);
                     }
                 }
 

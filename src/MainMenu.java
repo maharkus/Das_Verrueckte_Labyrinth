@@ -23,6 +23,9 @@ import org.opencv.video.Video;
 
 public class MainMenu extends JFrame{
 
+    GameWindow game;
+    Labyrinth canvas;
+
     public Font spookyFont;
 
     public Font spookyFont() {
@@ -87,7 +90,8 @@ public class MainMenu extends JFrame{
                 loadingScreen.setBackground(new Color(0, 0,0, 255));
                 loadingScreen.setSize(frame.getSize());
                 frame.add(loadingScreen);
-                GameWindow game = new GameWindow(frame);
+                game = new GameWindow(frame);
+                canvas = game.getCanvas();
                 frame.add(game.splitPane);
                 frame.setVisible(true);
                 game.animator.start();
@@ -154,5 +158,9 @@ public class MainMenu extends JFrame{
         new MainMenu();
         File background = new File("resources/sounds/backgroundMusic.wav");
         new PlayMusic(background,-20);
+    }
+
+    public Labyrinth getCanvas() {
+        return canvas;
     }
 }

@@ -1,18 +1,13 @@
 import java.awt.*;
-import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.swing.*;
-import javax.swing.plaf.basic.BasicSplitPaneDivider;
 
 import com.github.sarxos.webcam.Webcam;
 import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.util.FPSAnimator;
-import com.sun.tools.javac.Main;
-import org.opencv.core.Core;
-import org.opencv.videoio.VideoCapture;
 
 
 public class GameWindow {
@@ -31,6 +26,7 @@ public class GameWindow {
     Player player;
     JSplitPane splitPane;
     FPSAnimator animator;
+
 
     public GameWindow(JFrame frame) {
 
@@ -68,7 +64,7 @@ public class GameWindow {
 
         GridLayout grid = new GridLayout(5,1, 0,32);
         menuPanel.setLayout(grid);
-        menuPanel.setBorder(BorderFactory.createEmptyBorder(150, 50, 0, 50));
+        menuPanel.setBorder(BorderFactory.createEmptyBorder(100, 50, 0, 50));
 
 
 
@@ -145,9 +141,9 @@ public class GameWindow {
             t.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    menuPanel.add(Camera.Webcam.Camera());
+                    Webcam.Camera();
                 }
-            }, 0, 1);
+            }, 0, 8);
         }
         else {
          noCameraText = new JLabel("Es wurde keine Kamera erkannt!");
@@ -159,5 +155,9 @@ public class GameWindow {
            
            menuPanel.add(noCameraText);
         }
+    }
+
+    public Labyrinth getCanvas() {
+        return canvas;
     }
 }

@@ -1,5 +1,3 @@
-package Camera;
-
 public class HandMotionCounter {
 
     int [] counter = new int[4];
