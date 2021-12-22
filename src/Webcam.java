@@ -1,30 +1,17 @@
-package Camera;
-
 import org.opencv.core.*;
 import org.opencv.core.Point;
-import org.opencv.highgui.HighGui;
-import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
-import org.opencv.video.BackgroundSubtractor;
-import org.opencv.video.BackgroundSubtractorKNN;
-import org.opencv.video.BackgroundSubtractorMOG2;
 import org.opencv.videoio.VideoCapture;
 import org.opencv.videoio.Videoio;
-import org.opencv.video.Video;
 
 import javax.swing.*;
 import javax.swing.JFrame;
 import java.awt.*;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.awt.image.WritableRaster;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-
-import javax.swing.*;
 
 public class Webcam {
 
@@ -32,22 +19,29 @@ public class Webcam {
     static double camResHeight;
     static HandMotionCounter counter;
 
-    public static JLabel Camera (){
+    public Webcam(Labyrinth canvas, VideoCapture camera){
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
         Mat frame = new Mat();
 
-        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-        VideoCapture camera = new VideoCapture(0);
-
-        // JLabel
-        JLabel vidpanel = new JLabel();
+        //System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+        //VideoCapture camera = new VideoCapture(0);
 
         //Zugriff auf Camera Auflösung
         camResWidth = camera.get(Videoio.CAP_PROP_FRAME_WIDTH);
         camResHeight = camera.get(Videoio.CAP_PROP_FRAME_HEIGHT);
 
-        vidpanel.setSize(new Dimension(500, 300));
+        // JLabel
+        JLabel vidpanel = new JLabel();
+        vidpanel.setSize(new Dimension((int)camResWidth, (int)camResHeight));
+
+        //JFrame + set contentPane
+        JFrame window = new JFrame();
+        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        window.setContentPane(vidpanel);
+        window.setSize(new Dimension((int)camResWidth, (int)camResHeight));
+        window.setVisible(true);
+
 
         if (camera.isOpened()) {
 
@@ -57,14 +51,13 @@ public class Webcam {
             while (true) {
                 if (camera.read(frame)) {
 
-                    ImageIcon image = new ImageIcon(contourZeichnen(frame));
+                    ImageIcon image = new ImageIcon(contourZeichnen(frame, canvas));
 
                     vidpanel.setIcon(image);
                     vidpanel.repaint();
                 }
             }
         }
-        return vidpanel;
     }
 
     public static BufferedImage convertMatToBufferedImage(final Mat mat) {
@@ -94,7 +87,7 @@ public class Webcam {
 
 
         //Rect oben mitte
-        g2d.drawRect((int)Math.floor(camResWidth/2)-100,0,200,125);
+        g2d.drawRect((int)Math.floor(camResWidth/2)-100,0,250,200);
         //Rect unten mitte
         g2d.drawRect((int)Math.floor(camResWidth/2)-100,(int)Math.abs(camResHeight)-126,200,125);
         //Rect links mitte
@@ -108,7 +101,7 @@ public class Webcam {
         return rectangleImage;
     }
 
-    public static BufferedImage contourZeichnen(Mat mat){
+    public static BufferedImage contourZeichnen(Mat mat, Labyrinth canvas){
         List<MatOfPoint> contourPoints = new ArrayList<>();
         Mat processed = mat.clone();
         Mat hierarchy = new Mat();
@@ -166,9 +159,9 @@ public class Webcam {
                 Point bottomRightboundingRect = rect.br();
 
                 //Punkt oben Links
-                Point topLeftRectTopCenter = new Point ((int)Math.floor(camResWidth/2)-100 , 0);
+                Point topLeftRectTopCenter = new Point ((int)Math.floor(camResWidth/2)-125 , 0);
                 //Punkt unten rechts
-                Point bottomRightRectTopCenter = new Point ((int)Math.floor(camResWidth/2)+100 , 125);
+                Point bottomRightRectTopCenter = new Point ((int)Math.floor(camResWidth/2)+125 , 200);
 
                 //Punkt oben Links
                 Point topLeftRectbottomCenter = new Point ((int)Math.floor(camResWidth/2)-100, (int)Math.abs(camResHeight)-126);
@@ -191,7 +184,7 @@ public class Webcam {
                     counter.increaseCounter0();
                     if(counter.getCounter()[0] == 30){
                         counter.resetCounter();
-                        System.out.println("Das funktioniert");
+                        canvas.move(canvas.curvePoints.get(canvas.player.getPositionIndex()).getDirections()[(int) (canvas.player.getAngle()/90)]);
                     }
                 }
 
@@ -208,14 +201,14 @@ public class Webcam {
                     counter.increaseCounter2();
                     if(counter.getCounter()[2] == 30){
                         counter.resetCounter();
-                        System.out.println("Das funktioniert");
+                        canvas.rotate(90f);
                     }
                 }
                 if(topLeftboundingRect.x >= topLeftRectRightCenter.x && topLeftboundingRect.x <= bottomRightRightCenter.x && topLeftboundingRect.y >= topLeftRectRightCenter.y && topLeftboundingRect.y <= bottomRightRightCenter.y && bottomRightboundingRect.x <= bottomRightRightCenter.x && bottomRightboundingRect.y <= bottomRightRightCenter.y && bottomRightboundingRect.x >= topLeftRectRightCenter.x && bottomRightboundingRect.y >= topLeftRectRightCenter.y){
                     counter.increaseCounter3();
                     if(counter.getCounter()[3] == 30){
                         counter.resetCounter();
-                        System.out.println("Das funktioniert");
+                        canvas.rotate(-90f);
                     }
                 }
             }

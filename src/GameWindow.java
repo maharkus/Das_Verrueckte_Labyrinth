@@ -1,16 +1,12 @@
 import java.awt.*;
-import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.swing.*;
-import javax.swing.plaf.basic.BasicSplitPaneDivider;
 
-import com.github.sarxos.webcam.Webcam;
 import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.util.FPSAnimator;
-import com.sun.tools.javac.Main;
 import org.opencv.core.Core;
 import org.opencv.videoio.VideoCapture;
 
@@ -102,8 +98,6 @@ public class GameWindow {
         });
         menuPanel.add(btnLeft);
 
-
-
         JButton btnRight = new JButton("Rechts");
         btnRight.setBackground(new Color(102, 0, 153));
         btnRight.setForeground(Color.WHITE);
@@ -139,13 +133,15 @@ public class GameWindow {
 
     public void createCameraView(JPanel menuPanel) {
 
+        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+        VideoCapture camera = new VideoCapture(0);
 
-        if(Webcam.getDefault()!=null) {
+        if(camera.isOpened()) {
             Timer t = new Timer();
             t.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    menuPanel.add(Camera.Webcam.Camera());
+                    new Webcam(canvas, camera);
                 }
             }, 0, 1);
         }
