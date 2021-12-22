@@ -42,10 +42,6 @@ import com.jogamp.opengl.util.texture.TextureIO;
 import de.hshl.obj.loader.OBJLoader;
 import de.hshl.obj.loader.Resource;
 
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-
 import static com.jogamp.opengl.GL.*;
 import static com.jogamp.opengl.GL2.GL_MAP1_VERTEX_3;
 import static com.jogamp.opengl.math.FloatUtil.cos;
@@ -93,9 +89,7 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
     float[] nextFocus = new float[3];
     boolean focusSet = false;
 
-    enum directions {
-        right, up, left, down, stay
-    }
+    AmbientSounds ambientSounds = new AmbientSounds();
 
     private int noOfWalls;
     private float[] wallPos;
@@ -756,7 +750,6 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
             }
         }, 0, 8);
 
-
         if (curveIndex == 0) {
             File welcome = new File("resources/sounds/welcome.wav");
             new PlaySound(welcome,0);
@@ -771,7 +764,7 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
             new PlaySound(spookySound, 0f);
         }
         else if (Math.random() < 1) {
-            new PlaySound(new RandomSound().getRandomFile(),-20);
+            new PlaySound(ambientSounds.getRandomFile(),-20);
         }
 
     }
