@@ -650,8 +650,8 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         pmvMatrix.gluLookAt(player.getPositionX(), player.getPositionY(), player.getPositionZ(),
                 player.getFocusX(), player.getFocusY(), player.getFocusZ(),
                 0f, 1f, 0f);
-        pmvMatrix.glRotatef(interactionHandler.getAngleXaxis(), 1f, 0f, 0f);
-        pmvMatrix.glRotatef(interactionHandler.getAngleYaxis(), 0f, 1f, 0f);
+        //pmvMatrix.glRotatef(interactionHandler.getAngleXaxis(), 1f, 0f, 0f);
+        //pmvMatrix.glRotatef(interactionHandler.getAngleYaxis(), 0f, 1f, 0f);
 
         // Camera for debugging
         /*pmvMatrix.gluLookAt(0f, 0f, 600f,
@@ -748,7 +748,6 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
             public void run() {
                 player.setPosition(moveBetweenPoints(player.getPosition(), newPos, player.getPosition()));
                 player.setFocus(moveBetweenPoints(player.getPosition(), newPos, player.getFocus()));
-                System.out.println(Arrays.toString(player.getFocus()));
                 if (Arrays.equals(player.getPosition(), newPos)) {
                     t.purge();
                     t.cancel();
@@ -757,6 +756,7 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
             }
         }, 0, 8);
 
+
         if (curveIndex == 0) {
             File welcome = new File("resources/sounds/welcome.wav");
             new PlaySound(welcome,0);
@@ -764,10 +764,6 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         else if (curveIndex == 3 || curveIndex == 10 || curveIndex == 14 || curveIndex == 23) {
             File welcome = new File("resources/sounds/sackgasse.wav");
             new PlaySound(welcome,0);
-        }
-        else if (curveIndex == 2) {
-            File spookySound = new File("resources/sounds/spookyWav.wav");
-            new PlaySound(spookySound,0);
         }
         else if (curveIndex == 25) {
             new EndGame();
