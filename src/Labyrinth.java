@@ -719,15 +719,6 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         // Activating the compiled shader program.
         // Could be placed into the init-method for this simple example.
         gl.glUseProgram(shaderProgram.getShaderProgramID());
-
-        // Transfer the PVM-Matrix (model-view and projection matrix) to the GPU
-        // via uniforms
-        // Transfer projection matrix via uniform layout position 0
-        gl.glUniformMatrix4fv(0, 1, false, pmvMatrix.glGetPMatrixf());
-        // Transfer model-view matrix via layout position 1
-        gl.glUniformMatrix4fv(1, 1, false, pmvMatrix.glGetMvMatrixf());
-
-        drawCurve(gl2, curvePoints);
     }
 
     //Player Movements
@@ -756,12 +747,12 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         }
         else if (curveIndex == 3 || curveIndex == 10 || curveIndex == 14 || curveIndex == 23) {
             File welcome = new File("resources/sounds/sackgasse.wav");
-            new PlaySound(welcome,0);
+            new PlaySound(welcome,-10);
         }
         else if (curveIndex == 25) {
             new EndGame();
             File spookySound = new File("resources/sounds/dootDoot.wav");
-            new PlaySound(spookySound, 0f);
+            new PlaySound(spookySound, -10);
         }
         else if (Math.random() < 1) {
             new PlaySound(ambientSounds.getRandomFile(),-20);
