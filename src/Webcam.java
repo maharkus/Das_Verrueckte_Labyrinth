@@ -44,8 +44,8 @@ public class Webcam {
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setSize(new Dimension((int) camResWidth+20, (int) camResHeight+50));
         window.add(vidpanel);
-        window.setIconImage(icon);
         window.setVisible(true);
+        window.setIconImage(icon);
 
 
         if (camera.isOpened()) {
