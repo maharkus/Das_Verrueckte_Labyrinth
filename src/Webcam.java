@@ -18,8 +18,10 @@ public class Webcam {
     static double camResWidth;
     static double camResHeight;
     static HandMotionCounter counter;
+    Image icon = Toolkit.getDefaultToolkit().getImage("resources/labIcon.png");
 
     public Webcam(Labyrinth canvas, VideoCapture camera) {
+
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
         Mat frame = new Mat();
@@ -31,15 +33,18 @@ public class Webcam {
         camResWidth = camera.get(Videoio.CAP_PROP_FRAME_WIDTH);
         camResHeight = camera.get(Videoio.CAP_PROP_FRAME_HEIGHT);
 
+
         // JLabel
         JLabel vidpanel = new JLabel();
         vidpanel.setSize(new Dimension((int) camResWidth+10, (int) camResHeight));
+
 
         //JFrame + set contentPane
         JFrame window = new JFrame();
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setSize(new Dimension((int) camResWidth+20, (int) camResHeight+50));
         window.add(vidpanel);
+        window.setIconImage(icon);
         window.setVisible(true);
 
 
@@ -198,19 +203,22 @@ public class Webcam {
             counter.increaseCounter2();
             if (counter.getCounter()[2] == 30) {
                 counter.resetCounter();
-                canvas.rotate(90f);
+                canvas.rotate(-90f);
             }
         }
         if (topLeftboundingRect.x >= topLeftRectRightCenter.x && topLeftboundingRect.x <= bottomRightRightCenter.x && topLeftboundingRect.y >= topLeftRectRightCenter.y && topLeftboundingRect.y <= bottomRightRightCenter.y && bottomRightboundingRect.x <= bottomRightRightCenter.x && bottomRightboundingRect.y <= bottomRightRightCenter.y && bottomRightboundingRect.x >= topLeftRectRightCenter.x && bottomRightboundingRect.y >= topLeftRectRightCenter.y) {
             counter.increaseCounter3();
             if (counter.getCounter()[3] == 30) {
                 counter.resetCounter();
-                canvas.rotate(-90f);
+                canvas.rotate(90f);
             }
         }
 
         // Draw Contours to mat
         Imgproc.drawContours(mat, hullpointList, maxValueIdx, color2, 2);
+
+        // Mirror frames
+        Core.flip(mat, mat, +1);
 
         // Create Buffered Image
         BufferedImage processedesImage = convertMatToBufferedImage(mat);
