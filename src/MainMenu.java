@@ -26,7 +26,7 @@ public class MainMenu extends JFrame{
     Labyrinth canvas;
 
     public Font spookyFont;
-    Image icon = Toolkit.getDefaultToolkit().getImage("resources/labIcon.png");
+    Image icon = Toolkit.getDefaultToolkit().getImage("resources/transparentLogo.png");
 
     public Font spookyFont() {
         try {
