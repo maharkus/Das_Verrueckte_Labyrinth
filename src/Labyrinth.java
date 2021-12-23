@@ -719,15 +719,6 @@ public class Labyrinth extends GLCanvas implements GLEventListener {
         // Activating the compiled shader program.
         // Could be placed into the init-method for this simple example.
         gl.glUseProgram(shaderProgram.getShaderProgramID());
-
-        // Transfer the PVM-Matrix (model-view and projection matrix) to the GPU
-        // via uniforms
-        // Transfer projection matrix via uniform layout position 0
-        gl.glUniformMatrix4fv(0, 1, false, pmvMatrix.glGetPMatrixf());
-        // Transfer model-view matrix via layout position 1
-        gl.glUniformMatrix4fv(1, 1, false, pmvMatrix.glGetMvMatrixf());
-
-        drawCurve(gl2, curvePoints);
     }
 
     //Player Movements
