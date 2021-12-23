@@ -18,7 +18,7 @@ public class Webcam {
     static double camResWidth;
     static double camResHeight;
     static HandMotionCounter counter;
-    Image icon = Toolkit.getDefaultToolkit().getImage("resources/labIcon.png");
+    Image icon = Toolkit.getDefaultToolkit().getImage("resources/transparentLogo.png");
 
     public Webcam(Labyrinth canvas, VideoCapture camera) {
 
