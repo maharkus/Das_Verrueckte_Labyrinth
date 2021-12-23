@@ -8,7 +8,22 @@ import java.io.IOException;
 import java.util.Timer;
 import javax.swing.*;
 
+import org.opencv.core.*;
+import org.opencv.core.Point;
+import org.opencv.highgui.HighGui;
+import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.imgproc.Imgproc;
+import org.opencv.video.BackgroundSubtractor;
+import org.opencv.video.BackgroundSubtractorKNN;
+import org.opencv.video.BackgroundSubtractorMOG2;
+import org.opencv.videoio.VideoCapture;
+import org.opencv.videoio.Videoio;
+import org.opencv.video.Video;
+
 public class MainMenu extends JFrame{
+
+    GameWindow game;
+    Labyrinth canvas;
 
     public Font spookyFont;
     Image icon = Toolkit.getDefaultToolkit().getImage("resources/labIcon.png");
@@ -76,7 +91,7 @@ public class MainMenu extends JFrame{
                 loadingScreen.setBackground(new Color(0, 0,0, 255));
                 loadingScreen.setSize(frame.getSize());
                 frame.add(loadingScreen);
-                GameWindow game = new GameWindow(frame);
+                game = new GameWindow(frame);
                 frame.add(game.splitPane);
                 frame.setVisible(true);
                 game.animator.start();
@@ -143,5 +158,9 @@ public class MainMenu extends JFrame{
         new MainMenu();
         File background = new File("resources/sounds/backgroundMusic.wav");
         new PlayMusic(background,-20);
+    }
+
+    public Labyrinth getCanvas() {
+        return canvas;
     }
 }
