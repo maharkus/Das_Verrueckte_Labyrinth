@@ -6,7 +6,6 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.Timer;
-import java.util.TimerTask;
 import javax.swing.*;
 
 import org.opencv.core.*;
@@ -27,6 +26,7 @@ public class MainMenu extends JFrame{
     Labyrinth canvas;
 
     public Font spookyFont;
+    Image icon = Toolkit.getDefaultToolkit().getImage("resources/labIcon.png");
 
     public Font spookyFont() {
         try {
@@ -46,6 +46,7 @@ public class MainMenu extends JFrame{
 
         ImagePanel panel = new ImagePanel((new ImageIcon("resources/laby.jpg")).getImage());
 
+        this.setIconImage(icon);
         JLabel header = new JLabel("Das Verrückte Labyrinth", 0);
         header.setFont(spookyFont().deriveFont(80f));
         header.setForeground(Color.WHITE);
